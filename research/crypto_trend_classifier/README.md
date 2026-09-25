@@ -163,3 +163,21 @@ But vs the previous model and every classic indicator it is much faster (delay 1
 -6 to -9 points, 88-99% of tickers, p < 1e-9), keeps MCC 0.37 (CUSUM 0.14-0.19) and has better long/flat
 Sharpe than CUSUM (38/50, 285/510). Crypto: fastest detection (1D delay 18.5 vs 27-33 bars) but trading Sharpe
 below SuperTrend/EMA cross on the 5 coins.
+
+## Stage 13 — user label v2 on 4h (pre-registered, one test 2021-2026)
+`tc/label_v2.py`, `label_v2_preview.png`, `prereg/PREREG_stage13_label_v2_4h.md`, `prereg/FROZEN_stage13.json`,
+`results_stage13_test.csv`. Label: pivot-weighted score, forward volume-flow confirmation, rebounds in downtrends
+halved. New causal liquidity-location features (volume below price, VWAP and POC distance). LightGBM regression,
+Optuna on < 2019, conversion chosen on 2019-2020. Trained on 7 coins + Oanda FX/indices/gold; ADA/XRP/DOGE held out.
+Test (median of coin x year cells, missed move / delay bars / flips per true flip / MCC / long-flat Sharpe):
+| | held-out coins | training coins |
+|---|---|---|
+| Stage-13 model | 0.347 / 17.8 / 1.54 / 0.26 / 0.25 | 0.345 / 19 / 1.68 / 0.25 / 0.21 |
+| CUSUM (best baseline in validation) | 0.369 / 25 / 1.51 / 0.22 / 0.13 | 0.348 / 22.8 / 1.37 / 0.22 / 0.66 |
+| SuperTrend | 0.421 / 36.5 / 1.38 / 0.23 / 0.31 | 0.459 / 26.8 / 1.53 / 0.30 / 0.51 |
+| Crypto model C | 0.422 / 23.3 / 1.92 / 0.29 / 0.19 | 0.440 / 22 / 1.84 / 0.41 / 0.52 |
+| Stage-12 model (daily stocks, unchanged) | 0.304 / 14.8 / 2.35 / 0.26 / 0.04 | 0.342 / 15 / 2.23 / 0.31 / 0.59 |
+| buy & hold Sharpe | 0.10 | 0.51 |
+PRIMARY ENDPOINT NOT MET (vs CUSUM: 11/18 and 22/42 cells). Faster than SuperTrend, EMA cross and model C in
+78-98% of cells (p <= 0.03), but not faster than CUSUM or the stage-12 model, lower MCC than model C, and
+long/flat Sharpe below buy & hold on the training coins. Model vs label v2: Spearman 0.41.
