@@ -260,8 +260,7 @@ def _load_models():
 def predict_all():
     _load_models()
     tks = sorted(x[:-4] for x in os.listdir(f'{CD}/stk'))
-    with Pool(4) as pool:
-        stk = dict(pool.imap(_pred_stock, tks, chunksize=8))
+    stk = dict(_pred_stock(t) for t in tks)     # sequential: forking after loading boosters deadlocks OpenMP
     C = crypto_frames()
     cr = {}
     for key, f in C.items():
