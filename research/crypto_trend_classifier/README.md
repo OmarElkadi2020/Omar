@@ -135,3 +135,12 @@ A = 50 large caps and B = 510 other stocks, none seen in training.
   best calm classifier (MCC 0.41/0.43, flip precision 73-75%), beating calm-tuned EMA cross, SuperTrend and
   directional-change on 72-96% of stocks (all p<0.003); the calm stock model is slightly behind C.
 - Trading long/flat: no version beats buy & hold Sharpe per stock (these classify trend, they are not alpha).
+
+## Stage 11 — the frozen stock model applied UNCHANGED to crypto (never saw crypto)
+`tc/stage11.py`, `results_stage11_stock_model_on_crypto.csv`. Top-5 coins (BTC ETH BNB XRP SOL), 1D / 4h / 1h,
+market context = equal-weight coin basket (same formulas). All baselines keep their stock-tuned parameters.
+- Highest MCC of all classifiers on every timeframe: 1D 0.434 (all history), 4h 0.416, 1h 0.407 (2019-2026);
+  beats every indicator in 13-15 of 15 coin x timeframe cells.
+- Equal to the crypto-trained walk-forward model C (4h 0.416 vs 0.407, 1h 0.407 vs 0.411; C better in 6/10
+  cells), but with ~7 flips per true change vs ~2 for C; the calm stock version gets ~2.4 flips at MCC 0.37-0.41.
+- The model generalises across asset classes (stocks -> crypto) with no retraining.
