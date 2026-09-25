@@ -190,3 +190,35 @@ HYBRID beats ORIGINAL on 2/10, 2/10, 5/7, 4/8, 21/50 assets -> primary question:
 Cause: entering only on fresh flips leaves the strategy out of the market after each ATR stop (in market 44-63%
 vs 80-90%). Exploratory re-entry variant (enter whenever flat and the model says up/down): better than ORIGINAL
 on stocks (40/50) and indices (7/8) but still worse than buy & hold, and worse on crypto 4h (2/10).
+
+## Stage 15 — forward-return (time-series) trend model, alpha vs trend benchmarks (pre-registered)
+`prereg/PREREG_stage15_trend_alpha.md`, `results_stage15_*.csv`. One pooled MTF model (stocks 1D + crypto 4h +
+crypto 1D), target = vol-normalised forward 20-bar return, annual walk-forward refits. Spanning regression on
+buy & hold + TSMOM + EMA50 + Baz-MACD: stocks α −3.7 %/yr (t −2.1), crypto 4h t 0.2, crypto 1D t −0.2 ->
+**not met**. Single-asset timing adds nothing beyond classic trend rules. (Secondary: stock cross-sectional
+rank IC 0.033, t 4.9 -> the information is *relative*, which motivated stage 16.)
+
+## Stage 16 — cross-sectional trend model (pre-registered) — **crypto: MET**, stocks: not met
+`prereg/PREREG_stage16_cross_sectional_trend.md`, `tc/stage16.py`, `tc/robust16.py`, `results_stage16_*.csv`,
+`stage16_crypto.png`. The model ranks assets by expected *relative* forward return; book = long top 20 % /
+short bottom 20 %, averaged over `hold` days.
+* Crypto universe: **every Binance USDT spot pair incl. delisted ones** (659 files, top-100 by liquidity each day),
+  daily + 4h (MTF) features, execution at the close of the next 4h bar, 10 bp costs. Dev 2021 only.
+  Test 2022-01 … 2026-08 (annual refits): **long-short α = 82 %/yr, NW t = 5.3, Sharpe 2.3, CAGR 137 %,
+  max DD −40 %** after costs, vs MKT + BTC + SIZE + CMOM + STREV. Positive α in every year (t 1.4 … 6.0).
+  Robustness (post-hoc, labelled): shorts only through live USDT-M perps with real funding t 3.4 (Sharpe 1.65);
+  20 bp costs t 3.9; 30 bp t 2.5; top-50 coins t 5.8; drop 5 best contributors t 5.0; drop best 1 % days t 4.2;
+  +1 day delay t 3.7; long leg alone vs market α 30 %/yr t 4.4; market minus short leg t 5.0.
+  Found and fixed before reporting: log-return portfolio accounting (fake +σ²/2 on shorts; the buggy t 7.2
+  is kept in `*_LOGBUG.csv`).
+  Caveat: the equal-weight top-100 alt universe lost ~96 % in 2022-26, so the long-only book still lost money
+  in absolute terms; the edge is relative (long-short) or as an alt-selection overlay.
+* Stocks (861 current S&P 500/400 names, next-open execution, 5 bp): α −4.7 %/yr, t −1.5 -> **not met**
+  (dev chose a 3-day horizon; turnover 0.63/day; the book was spanned by UMD + STREV).
+
+## Stage 17 — stocks, monthly residual-trend model (pre-registered second attempt, hurdle t ≥ 3.5) — not met
+`prereg/PREREG_stage17_stocks_monthly_residual_trend.md`, `tc/stage17.py`, `results_stage17_stocks*.csv`.
+H = 21 days, residual target, Han-Zhou-Zhu MA signals, 52-week high, residual momentum, vol-managed book;
+controls add vol-managed UMD and a trend factor. 2011-2026: α 1.9 %/yr, **t 0.8**; unscaled t 0.06; long-only
+t 1.0; top-50 t −0.3. Everything the model finds in US large/mid caps is already in UMD / UMD_VM / SIZE.
+As pre-registered, no further attempt is made on this stock window.
