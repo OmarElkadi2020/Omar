@@ -220,3 +220,47 @@ def build(df, tf, htf_mult=(4, 24)):
         hf = core_features(hdf)[HTF_KEEP]
         X = X.join(join_by_close(base.index, step, hf, hs, f'h{m}_'))
     return base, X
+
+
+# ---------------------------------------------------------------- v3 additions: Bollinger + ATR (all causal)
+def bb_atr_features(df):
+    c = df.close
+    F = {}
+    for n in [20, 50, 100]:
+        mid = c.rolling(n).mean()
+        sd = c.rolling(n).std()
+        up, lo = mid + 2 * sd, mid - 2 * sd
+        bw = (up - lo) / mid
+        F[f'bb_pctb_{n}'] = (c - lo) / (up - lo).replace(0, np.nan) - 0.5          # position inside the bands
+        F[f'bb_bw_{n}'] = np.log(bw)                                                 # band width (log, relative)
+        F[f'bb_bwz_{n}'] = np.log(bw / bw.rolling(n * 10, min_periods=n * 3).median())  # width vs its own history
+        F[f'bb_bwroc_{n}'] = np.log(bw / bw.shift(max(n // 4, 2)))                  # rate of change of the width
+        lowest = bw.rolling(n * 5, min_periods=n).min()
+        is_sq = (bw <= lowest * 1.0001).astype(float)
+        # bars since the last squeeze (width at its n*5-bar low), log scale
+        grp = is_sq.cumsum()
+        since = is_sq.groupby(grp).cumcount().astype(float)
+        since[grp == 0] = np.nan
+        F[f'bb_since_sq_{n}'] = np.log1p(since)
+    for n in [14, 56]:
+        a = _atr(df, n)
+        ap = a / c
+        F[f'atrp_{n}'] = np.log(ap)                                                  # ATR as % of price
+        F[f'atrp_z_{n}'] = np.log(ap / ap.rolling(n * 20, min_periods=n * 5).median())
+        F[f'atr_roc_{n}'] = np.log(a / a.shift(n))
+    out = pd.DataFrame(F, index=df.index).replace([np.inf, -np.inf], np.nan)
+    return out.astype(np.float32)
+
+
+BB_HTF_KEEP = ['bb_pctb_20', 'bb_pctb_50', 'bb_bwz_20', 'bb_bwroc_20', 'atrp_z_14', 'atr_roc_14']
+
+
+def build_bb(df, tf, htf_mult=(4, 24)):
+    step = pd.Timedelta(tf)
+    base = df if tf == '1h' else resample(df, tf)
+    X = bb_atr_features(base)
+    for m in htf_mult:
+        hs = step * m
+        hf = bb_atr_features(resample(df, hs))[BB_HTF_KEEP]
+        X = X.join(join_by_close(base.index, step, hf, hs, f'h{m}_'))
+    return X
