@@ -1,0 +1,26 @@
+group,tf,clf,mcc,flips_per_oracle_flip,flip_precision,missed_move_frac
+FX,1h,EMA cross,0.461,4.919,0.599,0.326
+FX,1h,Model,0.446,1.787,0.773,0.464
+FX,1h,Online directional-change,0.437,2.982,0.662,0.329
+FX,1h,Price vs EMA,0.463,10.842,0.546,0.272
+FX,1h,SuperTrend,0.439,2.249,0.715,0.382
+FX,4h,EMA cross,0.451,4.738,0.602,0.333
+FX,4h,Model,0.443,1.923,0.757,0.456
+FX,4h,Online directional-change,0.41,1.679,0.787,0.463
+FX,4h,Price vs EMA,0.456,9.871,0.549,0.278
+FX,4h,SuperTrend,0.367,6.03,0.579,0.22
+Indices,1h,EMA cross,0.453,4.724,0.601,0.331
+Indices,1h,Model,0.444,1.857,0.763,0.459
+Indices,1h,Online directional-change,0.428,2.986,0.661,0.328
+Indices,1h,Price vs EMA,0.459,10.035,0.549,0.275
+Indices,1h,SuperTrend,0.431,2.565,0.687,0.359
+Indices,4h,EMA cross,0.447,4.803,0.598,0.322
+Indices,4h,Model,0.45,1.834,0.769,0.454
+Indices,4h,Online directional-change,0.396,1.645,0.79,0.464
+Indices,4h,Price vs EMA,0.452,9.69,0.549,0.271
+Indices,4h,SuperTrend,0.356,6.494,0.572,0.21
+Stocks,1D,EMA cross,0.414,5.663,0.589,0.328
+Stocks,1D,Model,0.419,2.122,0.736,0.446
+Stocks,1D,Online directional-change,0.375,1.695,0.773,0.471
+Stocks,1D,Price vs EMA,0.417,12.375,0.542,0.28
+Stocks,1D,SuperTrend,0.313,7.95,0.561,0.206
