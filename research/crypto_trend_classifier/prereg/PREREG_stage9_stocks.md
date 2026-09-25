@@ -5,6 +5,11 @@ Written before any stage-9 number was computed.
 `sp_prices.parquet` (Yahoo, 916 US large caps 1995-2026, 118 delisted included -> partial survivorship bias,
 affects all candidates and the benchmark alike). Daily `adj_close` (dividends included). Daily returns clipped
 at +-40% (data errors). Eligible stock on day t: >= 273 days of history and price > $1.
+**Amendment (user request, before any result was computed): universe = the 50 large caps of stage 3
+(`STOCKS` in tc/stage3.py) only, not all 916.** Caveat: this list is TODAY's largest companies, so it carries
+strong look-ahead/survivorship bias (e.g. NVDA, AVGO chosen because they won); the benchmark is built from the
+same 50, so comparisons are within-universe, but absolute returns are inflated. With 50 names: "decile" = top 5,
+"quintile" = top 10.
 Only price-derived indicators are used (no fundamentals, no macro). Cash earns 0 (conservative for timing rules).
 
 ## Split
