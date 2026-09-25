@@ -1,0 +1,21 @@
+test,metric,base,with_xs,diff,t,cells
+k=1 (normal trends),mcc,0.4018,0.4014,-0.0004,-0.1277,48
+k=1 (normal trends),flips_per_oracle_flip,1.8859,1.8863,0.0004,0.0383,48
+k=1 (normal trends),flip_precision,0.7594,0.7584,-0.001,-0.5805,48
+k=1 (normal trends),capture,0.048,0.051,0.0029,1.1059,48
+k=1 (normal trends),missed_move_frac,0.4489,0.4449,-0.004,-2.4472,48
+k=2 (big trends),mcc,0.381,0.3754,-0.0056,-1.3514,48
+k=2 (big trends),flips_per_oracle_flip,2.3059,2.2335,-0.0723,-2.5763,48
+k=2 (big trends),flip_precision,0.7361,0.742,0.0059,2.1942,48
+k=2 (big trends),capture,0.063,0.0801,0.0172,2.5453,48
+k=2 (big trends),missed_move_frac,0.4105,0.4155,0.0049,1.5049,48
+k=3 (very big trends),mcc,0.401,0.3939,-0.0071,-1.3251,48
+k=3 (very big trends),flips_per_oracle_flip,2.4488,2.5207,0.0718,1.3408,48
+k=3 (very big trends),flip_precision,0.7308,0.729,-0.0017,-0.5601,48
+k=3 (very big trends),capture,0.1016,0.0997,-0.0019,-0.2123,48
+k=3 (very big trends),missed_move_frac,0.3663,0.363,-0.0033,-1.14,48
+"CONTROL k=2: same model, other seed",mcc,0.381,0.3832,0.0022,0.8467,48
+"CONTROL k=2: same model, other seed",flips_per_oracle_flip,2.3059,2.3105,0.0046,0.2337,48
+"CONTROL k=2: same model, other seed",flip_precision,0.7361,0.733,-0.0031,-1.1911,48
+"CONTROL k=2: same model, other seed",capture,0.063,0.0587,-0.0043,-0.78,48
+"CONTROL k=2: same model, other seed",missed_move_frac,0.4105,0.4113,0.0007,0.467,48

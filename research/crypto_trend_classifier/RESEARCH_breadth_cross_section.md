@@ -44,3 +44,16 @@
 - [Up or down? Short-term reversal, momentum, and liquidity effects in cryptocurrency markets](https://www.sciencedirect.com/science/article/pii/S1057521921002349); [Cryptocurrency Momentum and Reversal (Dobrynskaya)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3913263)
 - [PCA of crypto returns — first component ~74%](https://pmc.ncbi.nlm.nih.gov/articles/PMC9689272/); [Are cryptocurrencies becoming more interconnected?](https://arxiv.org/pdf/2009.14561)
 - [Early-warning signals across seven crypto liquidation cascades](https://arxiv.org/pdf/2607.27070)
+
+## النتيجة (2026-09-25): هل تحسّن هذه الميزات تصنيف الاتجاه؟ — لا، بشكل ثابت
+نفس النموذج C ونفس المعاملات المجمدة، مع/بدون 11 ميزة مقطعية (Absorption Ratio 30 يوم و7 أيام وتغيره، متوسط الارتباط،
+التشتت، عائد السلة 7/30 يوم، عائد العملة ناقص السلة، ترتيب الزخم 14 يوم). Walk-forward بأربع طيات 2019–2026، 6 عملات × 1h/4h.
+| الاختبار | MCC بدون → مع | الانقلابات لكل انقلاب حقيقي | الالتقاط (capture) |
+|---|---|---|---|
+| ترندات عادية k=1 | 0.402 → 0.401 (t=-0.1) | بلا فرق | بلا فرق (t=1.1) |
+| ترندات كبيرة k=2 | أسوأ قليلًا (t=-1.4) | أقل 0.07 (t=-2.6) | +0.017 (t=2.6) |
+| ترندات أكبر k=3 | أسوأ قليلًا (t=-1.3) | أكثر 0.07 (t=+1.3) | بلا فرق |
+| ضبط الضوضاء (نفس النموذج، بذرة مختلفة) | t=0.9 | t=0.2 | t=-0.8 |
+الإشارة الوحيدة (k=2) تنعكس عند k=3، ومع 3 اختبارات فإن t≈2.5 واحدة متوقعة بالصدفة → لا تحسن موثوق.
+التفسير المرجح: مع 6–10 عملات فقط، و PC1 ≈ 60–80% دائمًا، المقاييس المقطعية تكرر ما يقوله سعر BTC/السلة، والنموذج يرى السعر أصلًا.
+الملفات: `results_stage6_cross_section_features.csv`, `tc/xs.py`, `tc/xs2.py`.
