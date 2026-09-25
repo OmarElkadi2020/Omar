@@ -76,3 +76,27 @@ python -m tc.final_model    # نموذج الإنتاج + الحالة الحا�
 - الميزة الثابتة الوحيدة في كل الأسواق: **نفس الدقة تقريبًا مع إشارات انعكاس أقل بكثير وأصدق (74–77% صحيحة)**.
 
 ![stage3](stage3_results.png)
+
+## Final verdict (stages 5–7) — indicator and trading tool testing complete
+
+### Stage 5 — inside the original Jesse strategy (only `regime()` replaced), 21 assets
+`results_stage5_jesse.csv`, `stage5_jesse.png`. MODEL-4h beats ORIGINAL on Sharpe in 2/6 crypto, 1/7 gold+FX,
+6/8 indices (where the strategy loses money anyway). Pre-registered question: yes only for indices.
+
+### Stage 6 — cross-sectional features (absorption ratio, correlation, dispersion, rank)
+`results_stage6_cross_section_features.csv`. No robust gain (MCC unchanged; the only positive signal at k=2
+reverses at k=3). See `RESEARCH_breadth_cross_section.md`.
+
+### Stage 7 — the indicator as a standalone long/flat trading tool, 92 series, costs included
+`results_stage7_trading.csv`, `results_stage7_wins.csv`, `stage7_trading.png`, `prereg/PREREG_stage7_trading.md`.
+Median long/flat Sharpe: crypto MODEL 0.51 vs EMA200 0.24, SuperTrend 0.36, buy & hold 0.48;
+stocks 0.19 vs EMA200 0.19, buy & hold 0.32; FX and indices negative for every signal.
+Series where MODEL Sharpe > EMA200: crypto 7/12, FX 7/12, indices 7/18, stocks 28/50 — none significant (sign test).
+MODEL beats SuperTrend on stocks 35/50 (p=0.007) and online DC on crypto 10/12 (p=0.04); loses to buy & hold
+on most series. It trades 2–5x less than the moving-average rules and survives doubled costs / one-bar delay
+better than they do. Pre-registered question: MODEL beats EMA200 on the majority in crypto, FX and stocks but
+not significantly; it does not beat the best baseline of each group except in crypto (vs EMA200 as best, 7/12).
+
+**Bottom line:** the classifier is a clean, low-turnover trend filter that roughly matches the best simple
+rules and cuts drawdown versus buy & hold in crypto, but it is not a source of alpha: no market group shows
+a significant, consistent edge over EMA200 or over buy & hold.

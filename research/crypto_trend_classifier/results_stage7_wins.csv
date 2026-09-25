@@ -1,0 +1,21 @@
+group,vs,model_wins,series,p_sign
+Crypto,EMA200,7,12,0.774
+Crypto,SuperTrend,9,12,0.146
+Crypto,EMA cross,7,12,0.774
+Crypto,Online directional-change,10,12,0.039
+Crypto,Buy & hold,6,12,1.0
+FX,EMA200,7,12,0.774
+FX,SuperTrend,4,12,0.388
+FX,EMA cross,6,12,1.0
+FX,Online directional-change,7,12,0.774
+FX,Buy & hold,3,12,0.146
+Indices,EMA200,7,18,0.481
+Indices,SuperTrend,12,18,0.238
+Indices,EMA cross,9,18,1.0
+Indices,Online directional-change,10,18,0.815
+Indices,Buy & hold,1,18,0.0
+Stocks,EMA200,28,50,0.48
+Stocks,SuperTrend,35,50,0.007
+Stocks,EMA cross,24,50,0.888
+Stocks,Online directional-change,21,50,0.322
+Stocks,Buy & hold,10,50,0.0
