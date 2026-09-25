@@ -111,3 +111,13 @@ a significant, consistent edge over EMA200 or over buy & hold.
   1.06 -> -0.07; plain carry -0.08; cross-sectional momentum -0.4 to -0.7; dollar carry -0.34.
 - Verdict: the classic FX premia (trend, carry, momentum) were strong until ~2004 and have not paid since,
   consistent with the literature on their decay. No pre-registered filter beats the FX market out of sample.
+
+## Stage 9 — technical-only trend filters on the top-50 US stocks (pre-registered)
+`prereg/PREREG_stage9_stocks.md`, `results_stage9_stocks.csv`, `stage9_stocks.png`.
+Selected on 1996-2010: market timing by breadth (% of the 50 above own SMA200 > 50%).
+Test 2011-2026: Sharpe 1.11 vs equal-weight buy & hold 1.08 (difference CI [-0.17, +0.21], not significant);
+CAGR 15.5% vs 20.4%; vol 13% vs 17%; max DD -27.5% vs -30.8% (COVID -26% vs -31%, 2022 -14% vs -23%).
+Of the 12 filters only 2 beat buy & hold on test Sharpe (both by < 0.04). Momentum top-5 had the highest CAGR
+(28.9%) but lower Sharpe (0.93) and deeper drawdown. Verdict: technical filters can trade some return for a
+smaller drawdown, but none beats buy & hold on risk-adjusted return. Universe has strong look-ahead bias
+(today's 50 largest), so absolute returns are inflated for every line.
