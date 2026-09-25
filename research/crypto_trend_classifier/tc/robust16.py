@@ -43,8 +43,10 @@ def main(market='crypto'):
 
     base, _ = run_book(book(S), rex, cfg['cost'], hold)
     add('baseline (as reported, 10bp)', base)
-    for c in (0.002, 0.003):
-        add(f'costs {int(c * 1e4)}bp', run_book(book(S), rex, c, hold)[0])
+    for c in ((0.002, 0.003) if market == 'crypto' else (0.001, 0.0015)):
+        add(f'costs {c * 1e4:g}bp', run_book(book(S), rex, c, hold)[0])
+    if market == 'stocks':
+        return stocks_extra(S, rex, F, cfg, hold, base, add, rows, D)
     fund, listed = funding_panel(rex.index)
     # long leg on spot; short leg only in coins with a live USDT-M perpetual, paying/receiving real funding
     rk = S.rank(axis=1, pct=True)
@@ -79,6 +81,25 @@ def main(market='crypto'):
     add('best 1% of days removed', base[base < q])
     R = pd.DataFrame(rows)
     R.to_csv(f'results_stage16_{market}_robustness.csv', index=False)
+    print(R.round(3).to_string())
+
+
+def stocks_extra(S, rex, F, cfg, hold, base, add, rows, D):
+    from .stage10 import splits
+    wsh = -book(S).clip(upper=0).rolling(hold, min_periods=1).mean().sum(axis=1)
+    add('borrow fee 1%/yr on shorts', base - wsh * 0.01 / 252)
+    add('long leg minus EW market', run_book(book(S, long_only=True), rex, cfg['cost'], hold)[0] - F['MKT'])
+    rk = S.rank(axis=1, pct=True)
+    sb = -((rk <= 0.2)).div((rk <= 0.2).sum(axis=1).replace(0, np.nan), axis=0).fillna(0)
+    add('EW market minus short leg', F['MKT'] + run_book(sb, rex, cfg['cost'], hold)[0])
+    A = [t for t in splits()['A'] if t in S.columns]
+    add('top-50 large caps only (set A)', run_book(book(S[A]), rex[A], cfg['cost'], hold)[0])
+    dv = D['dv'].loc[rex.index]
+    S200 = S.where(dv.where(S.notna()).rank(axis=1, ascending=False) <= 200)
+    add('top-200 by dollar volume only', run_book(book(S200), rex, cfg['cost'], hold)[0])
+    add('best 1% of days removed', base[base < base.quantile(0.99)])
+    R = pd.DataFrame(rows)
+    R.to_csv('results_stage16_stocks_robustness.csv', index=False)
     print(R.round(3).to_string())
 
 
