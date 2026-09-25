@@ -1,0 +1,32 @@
+{
+ "span": 5,
+ "h": 0.05,
+ "val_mcc": 0.4285183012834534,
+ "val_flips": 1.8181818181818181,
+ "baselines": {
+  "EMA cross": {
+   "params": {
+    "fast": 20,
+    "slow": 100
+   },
+   "val_mcc": 0.38193514808910467,
+   "val_flips": 1.5
+  },
+  "SuperTrend": {
+   "params": {
+    "period": 10,
+    "factor": 4
+   },
+   "val_mcc": 0.378217962543493,
+   "val_flips": 2.0
+  },
+  "Online directional-change": {
+   "params": {
+    "k": 1.5
+   },
+   "val_mcc": 0.39192821377580633,
+   "val_flips": 1.7
+  }
+ },
+ "frozen_at": "2026-09-25T19:12:43.479195+00:00"
+}

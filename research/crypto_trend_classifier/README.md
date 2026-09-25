@@ -121,3 +121,17 @@ Of the 12 filters only 2 beat buy & hold on test Sharpe (both by < 0.04). Moment
 (28.9%) but lower Sharpe (0.93) and deeper drawdown. Verdict: technical filters can trade some return for a
 smaller drawdown, but none beats buy & hold on risk-adjusted return. Universe has strong look-ahead bias
 (today's 50 largest), so absolute returns are inflated for every line.
+
+## Stage 10 — one trend model for any single stock (pre-registered, ticker AND time hold-outs)
+`prereg/PREREG_stage10_stock_model.md`, `prereg/FROZEN_stage10.json`, `prereg/FROZEN_stage10b.json`,
+`results_stage10_stock_model.csv`, `results_stage10b_calm.csv`, `trend_model_stocks.txt`, `stage10_stock_model.png`.
+LightGBM + Optuna (40 trials) on 177 causal features incl. choppiness (Choppiness Index, EMA20 cross rate,
+variance ratio, trend R^2) and market context; trained on 300 tickers before 2011; tested once 2011-2026 on
+A = 50 large caps and B = 510 other stocks, none seen in training.
+- Accurate version (MCC-tuned): median MCC 0.431 (A) / 0.445 (B) vs best tuned indicator (price vs EMA50)
+  0.398 / 0.421; beats it on 38/50 (p=3e-4) and 354/510 (p=1e-18) stocks; beats EMA200 on 47/50 and 462/510.
+  Holds in 2011-2018 and 2019-2026. PRIMARY ENDPOINT MET. But ~6 flips per true trend change.
+- Calm versions (<= 2 flips per true change, chosen on validation only): the crypto-trained model C is the
+  best calm classifier (MCC 0.41/0.43, flip precision 73-75%), beating calm-tuned EMA cross, SuperTrend and
+  directional-change on 72-96% of stocks (all p<0.003); the calm stock model is slightly behind C.
+- Trading long/flat: no version beats buy & hold Sharpe per stock (these classify trend, they are not alpha).
