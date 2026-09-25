@@ -115,7 +115,7 @@ def daily_features(P, mkt_ret, lags):
     F['size'] = np.log(DV.rolling(30, min_periods=10).median())
     F['dv_chg'] = np.log(DV.rolling(7).mean() / DV.rolling(30).mean())
     cov = r.rolling(60, min_periods=30).cov(mkt_ret)
-    beta = cov / mkt_ret.rolling(60, min_periods=30).var()
+    beta = cov.div(mkt_ret.rolling(60, min_periods=30).var(), axis=0)
     F['beta_60'] = beta
     F['resmom_30'] = (r - beta.mul(mkt_ret, axis=0)).rolling(30).sum()
     F['age'] = np.log1p(C.notna().cumsum())
