@@ -1,0 +1,30 @@
+Spearman IS vs OOS sharpe across 501 configs: 0.564
+median OOS Sharpe by IS quintile: {'Q1 worst': 0.65, 'Q2': 0.87, 'Q3': 0.94, 'Q4': 1.02, 'Q5 best IS': 1.12}
+
+IS 2013-06..2021 -> OOS 2022..2026-09
+best IS config: {'st_period': 19, 'st_factor': 5.0, 'ema4': 60, 'don_period': 40, 'atr_stop': 1.0, 'trail_atr': 4.5, 'exit_on_flip': 1, 'l_adx': 4, 's_adx': 8, 's_stop': 2.5, 's_trail': 2.0, 's_tp': 4.5, 'session': '24x7'} IS sharpe 2.38
+Default (his gold params)        IS 1.77 | OOS {'sharpe': np.float64(1.11), 'cagr': np.float64(32.1), 'dd': np.float64(-25.0)}
+Best IS Sharpe                   IS 2.38 | OOS {'sharpe': np.float64(1.16), 'cagr': np.float64(75.1), 'dd': np.float64(-45.2)}
+Top-10 ensemble (avg returns)    IS 2.38 | OOS {'sharpe': np.float64(1.41), 'cagr': np.float64(71.3), 'dd': np.float64(-27.6)}
+Random config (median of all)    OOS sharpe 0.96  (IQR 0.73..1.12)
+Buy & hold BTC                   IS 1.25 | OOS {'sharpe': np.float64(0.5), 'cagr': np.float64(13.6), 'dd': np.float64(-67.0)}
+median OOS sharpe of top-10% IS configs: 1.16
+median OOS by session: {'24x7': 0.98, 'cme': 0.95} IS: {'24x7': 1.28, 'cme': 1.42}
+2016 chosen best 333 test sharpe best 2.16 top10 1.99 default 2.15 all-median 1.48 B&H 1.92
+2017 chosen best 333 test sharpe best 3.93 top10 3.79 default 3.19 all-median 1.92 B&H 3.3
+2018 chosen best 109 test sharpe best 1.06 top10 0.95 default 0.42 all-median 0.91 B&H -1.16
+2019 chosen best 109 test sharpe best 1.78 top10 2.06 default 0.97 all-median 1.73 B&H 1.29
+2020 chosen best 109 test sharpe best 1.98 top10 2.36 default 2.3 all-median 1.63 B&H 2.25
+2021 chosen best 333 test sharpe best 1.37 top10 1.03 default 0.97 all-median 0.25 B&H 0.98
+2022 chosen best 333 test sharpe best -0.37 top10 -0.2 default 0.08 all-median 0.07 B&H -1.28
+2023 chosen best 333 test sharpe best 2.34 top10 2.66 default 2.46 all-median 2.16 B&H 2.35
+2024 chosen best 109 test sharpe best 2.2 top10 1.71 default 1.48 all-median 0.96 B&H 1.74
+2025 chosen best 109 test sharpe best 0.7 top10 0.44 default -0.3 all-median 0.23 B&H 0.05
+2026 chosen best 109 test sharpe best 0.57 top10 1.05 default 0.84 all-median 0.92 B&H 0.13
+
+Walk-forward 2016..2026 stitched OOS:
+  re-opt best                    {'sharpe': np.float64(1.75), 'cagr': np.float64(179.8), 'dd': np.float64(-53.2)}
+  re-opt top10 ensemble          {'sharpe': np.float64(1.71), 'cagr': np.float64(98.6), 'dd': np.float64(-33.6)}
+  default fixed                  {'sharpe': np.float64(1.48), 'cagr': np.float64(55.0), 'dd': np.float64(-25.0)}
+  equal-weight ALL 501 configs   {'sharpe': np.float64(1.57), 'cagr': np.float64(50.5), 'dd': np.float64(-17.3)}
+  buy&hold                       {'sharpe': np.float64(1.07), 'cagr': np.float64(63.5), 'dd': np.float64(-83.4)}
