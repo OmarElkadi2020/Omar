@@ -244,9 +244,9 @@ def alpha(ret, F, lag=20):
 
 def stats(x, bpy):
     x = x.dropna()
-    eq = x.cumsum()
-    return dict(ann_ret=float(x.mean() * bpy), sharpe=float(x.mean() / x.std() * np.sqrt(bpy)),
-                max_dd=float((np.exp(eq - eq.cummax()) - 1).min()))
+    eq = np.log1p(x.clip(lower=-0.99)).cumsum()
+    return dict(ann_ret=float(x.mean() * bpy), cagr=float(np.expm1(eq.iloc[-1] * bpy / len(x))),
+                sharpe=float(x.mean() / x.std() * np.sqrt(bpy)), max_dd=float((np.exp(eq - eq.cummax()) - 1).min()))
 
 
 # ------------------------------------------------------------------ model
@@ -290,6 +290,8 @@ def predict(m, cols, X, lo, hi):
 def load(market):
     X = pd.read_pickle(f'{CD}/{market}_X.pkl')
     D = pd.read_pickle(f'{CD}/{market}_P.pkl')
+    # portfolio accounting must use SIMPLE returns: summing w*log-returns hands shorts a fake +sigma^2/2 per bar
+    D['rex'] = np.expm1(D['rex'].astype(float))
     return X, D
 
 
@@ -390,5 +392,11 @@ def report(market, S, D, p):
     print(f'PRIMARY {market}:', bool(R.iloc[0].alpha_ann > 0 and R.iloc[0].alpha_t >= 3))
 
 
+def rereport(market):
+    p = json.load(open(f'FROZEN_stage16_{market}.json'))['params']
+    X, D = load(market)
+    report(market, pd.read_pickle(f'{CD}/{market}_scores.pkl'), D, p)
+
+
 if __name__ == '__main__':
-    dict(build=build, tune=tune, test=test)[sys.argv[1]](sys.argv[2])
+    dict(build=build, tune=tune, test=test, rereport=rereport)[sys.argv[1]](sys.argv[2])
