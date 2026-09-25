@@ -32,3 +32,8 @@ tickers with a two-sided sign test p < 0.05.
 ## Secondary (reported whatever they show)
 Flip precision, flips per true flip, missed-move and give-back fractions, long/flat Sharpe vs buy & hold
 per stock, distribution over tickers (share of tickers where the model wins), sub-periods 2011-2018 / 2019-2026.
+
+## Amendment (user request, before any tuning or result): explicit choppiness features added
+chop_14, chop_50 (Choppiness Index), ema20_cross_rate_50 (share of the last 50 days with a close crossing EMA20),
+var_ratio_5_250 (Lo-MacKinlay variance ratio, >1 trending, <1 choppy), trend_r2_50 / trend_r2_150
+(R^2 of log price on time). All rolling windows end at t (causal).
