@@ -23,7 +23,7 @@ def stats(pos, c, y, bpy):
     eq = np.cumsum(pnl)
     dd = np.exp(eq - np.maximum.accumulate(np.maximum(eq, 0))) - 1
     yrs = len(c) / bpy
-    s = np.where(pos > 0, 1, -1)
+    s = np.where(pos > 0, 1, -1)  # neutral/down both count as 'not up'
     fl = np.flatnonzero(s[1:] != s[:-1]) + 1
     return dict(sharpe=pnl.mean() / pnl.std() * np.sqrt(bpy), cagr=np.exp(eq[-1] / yrs) - 1, maxdd=dd.min(),
                 total=np.exp(eq[-1]) - 1, trades=int(np.sum((pos[1:] > 0) & (pos[:-1] <= 0)) + (pos[0] > 0)),
@@ -35,6 +35,11 @@ def main():
     fz, fzb = json.load(open('FROZEN_stage10.json')), json.load(open('FROZEN_stage10b.json'))
     ms = lgb.Booster(model_file='trend_model_stocks.txt')
     o = pd.read_pickle('out_stage2_C.pkl')
+    from .stage12 import crypto_frames, score, to_state, parse_cfg
+    meta = json.load(open('stage12_model_meta.json'))
+    m12 = lgb.Booster(model_file='trend_model_stage12.txt')
+    c12 = json.load(open('FROZEN_stage12.json'))['cols']
+    CF = crypto_frames()
     out = {}
     for tf in ('1D', '4h'):
         m = basket_market(tf)
@@ -43,6 +48,8 @@ def main():
             pr = ms.predict(f[fz['cols']])
             st = {'acc': smooth_state(pr, fz['params']['smooth_span'], fz['params']['hysteresis']),
                   'calm': smooth_state(pr, fzb['span'], fzb['h'])}
+            g12 = CF[(a, tf)].reindex(f.index)
+            st['fast'] = to_state(score(m12, meta['kind'], meta['sd'], g12[c12]), parse_cfg(meta['cfg']))
             if tf == '4h':
                 x = o[(o.asset == a) & (o.tf == tf)]
                 cm = pd.Series(np.nan, f.index)

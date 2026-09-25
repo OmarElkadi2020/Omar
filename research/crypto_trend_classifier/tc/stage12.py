@@ -297,6 +297,8 @@ def final():
         states = {'STAGE-12 MODEL': to_state(sc, cfg),
                   'Stage-10 calm model': smooth_state(calm.predict(f[fz10['cols']]), fzb['span'], fzb['h'])}
         for bl, b in FZ['baselines'].items():
+            if bl == 'BASE Stage-10 calm model':
+                continue                     # already included above
             states[bl.replace('BASE ', '')] = base_state(bl.replace('BASE ', ''), b['cfg'], f)
         w = (f.index >= lo) & (f.index < hi) & f.final.values
         if w.sum() < 200 or len(set(f.y.values[w])) < 2:

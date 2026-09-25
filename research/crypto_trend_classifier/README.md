@@ -144,3 +144,22 @@ market context = equal-weight coin basket (same formulas). All baselines keep th
 - Equal to the crypto-trained walk-forward model C (4h 0.416 vs 0.407, 1h 0.407 vs 0.411; C better in 6/10
   cells), but with ~7 flips per true change vs ~2 for C; the calm stock version gets ~2.4 flips at MCC 0.37-0.41.
 - The model generalises across asset classes (stocks -> crypto) with no retraining.
+
+## Stage 12 — faster trend detection (pre-registered; CPCV on pre-2011 dev data, one test)
+`PLAN_stage12_questions.md`, `prereg/PREREG_stage12_fast_trend.md`, `prereg/FROZEN_stage12.json`,
+`results_stage12_cpcv.csv`, `results_stage12_test.csv`, `trend_model_stage12.txt`.
+New features: CUSUM (3 sensitivities), Bayesian online changepoint, normalised MACD, vol-normalised returns,
+OBV/AD slopes (leak test = 0). 7 labels x 80 signal conversions compared by 15-split CPCV on validation tickers.
+Selected: oracle k=1 label with weight 3 on the first 20% of each trend (B1w), EWM 3 + hysteresis 0.2.
+Test 2011-2026 (median, missed move / delay bars / flips per true flip / MCC):
+| | set A (50) | set B (510) |
+|---|---|---|
+| Stage-12 model | 0.367 / 12 / 2.24 / 0.37 | 0.355 / 12 / 2.30 / 0.37 |
+| Stage-10 calm model | 0.423 / 17.5 / 2.03 / 0.39 | 0.412 / 17 / 2.08 / 0.40 |
+| Pure CUSUM (best baseline in CPCV) | 0.373 / 14 / 1.45 / 0.14 | 0.349 / 14 / 1.27 / 0.19 |
+| SuperTrend (tuned) | 0.431 / 18.5 / 2.10 / 0.37 | 0.419 / 18 / 2.00 / 0.39 |
+PRIMARY ENDPOINT NOT MET: vs pure CUSUM the missed move is equal (A 28/50, B 240/508 tickers better).
+But vs the previous model and every classic indicator it is much faster (delay 12 vs 17-25 bars, missed move
+-6 to -9 points, 88-99% of tickers, p < 1e-9), keeps MCC 0.37 (CUSUM 0.14-0.19) and has better long/flat
+Sharpe than CUSUM (38/50, 285/510). Crypto: fastest detection (1D delay 18.5 vs 27-33 bars) but trading Sharpe
+below SuperTrend/EMA cross on the 5 coins.
