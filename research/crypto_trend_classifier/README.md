@@ -181,3 +181,12 @@ Test (median of coin x year cells, missed move / delay bars / flips per true fli
 PRIMARY ENDPOINT NOT MET (vs CUSUM: 11/18 and 22/42 cells). Faster than SuperTrend, EMA cross and model C in
 78-98% of cells (p <= 0.03), but not faster than CUSUM or the stage-12 model, lower MCC than model C, and
 long/flat Sharpe below buy & hold on the training coins. Model vs label v2: Spearman 0.41.
+
+## Stage 14 — our model as early entry + the video strategy's ATR exits (pre-registered)
+`prereg/PREREG_stage14_hybrid.md`, `results_stage14_hybrid.csv` (+ `_exploratory.csv`). Stage-12 model, unseen
+by every market tested. Median Sharpe (ORIGINAL approx. / HYBRID / buy & hold): crypto 4h 0.61 / 0.27 / 0.43;
+crypto 1D 0.42 / 0.08 / 0.42; gold+FX -0.22 / -0.14 / -0.09; indices -0.19 / -0.28 / 0.12; stocks 0.03 / 0.03 / 0.46.
+HYBRID beats ORIGINAL on 2/10, 2/10, 5/7, 4/8, 21/50 assets -> primary question: NO in every group.
+Cause: entering only on fresh flips leaves the strategy out of the market after each ATR stop (in market 44-63%
+vs 80-90%). Exploratory re-entry variant (enter whenever flat and the model says up/down): better than ORIGINAL
+on stocks (40/50) and indices (7/8) but still worse than buy & hold, and worse on crypto 4h (2/10).
