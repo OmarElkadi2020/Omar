@@ -1,0 +1,12 @@
+filter,dev_sharpe,test_sharpe,test_2005_12,test_2013_20
+Carry filtered by Baz,1.063,-0.068,0.158,-0.281
+Carry filtered by EMA 32/128,0.984,0.241,0.404,0.088
+Carry filtered by TSMOM 63d,0.981,-0.12,0.197,-0.421
+Dollar carry,0.94,-0.34,-0.014,-0.675
+Carry filtered by TSMOM 252d,0.905,-0.035,-0.153,0.08
+Carry + XS mom 63d,0.636,-0.543,-0.224,-0.851
+Carry 3x3,0.45,-0.076,0.128,-0.27
+XS momentum 126d,0.431,-0.405,-0.62,-0.209
+XS momentum 63d,0.337,-0.654,-0.452,-0.843
+XS momentum 252d,0.199,-0.4,-0.329,-0.469
+XS momentum 21d,0.007,-0.698,-0.614,-0.776

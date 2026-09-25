@@ -1,0 +1,15 @@
+filter,dev_sharpe,test_sharpe
+Continuous trend (Baz),1.111,-0.109
+Donchian 20,1.056,-0.267
+Ensemble (all 12 rules),1.039,-0.106
+EMA 8/32,1.006,-0.175
+TSMOM 21d,0.932,-0.218
+EMA 32/128,0.895,0.1
+EMA 16/64,0.888,-0.024
+TSMOM 63d,0.851,-0.139
+Donchian 100,0.838,-0.054
+Donchian 55,0.812,-0.019
+TSMOM 252d,0.808,-0.192
+EMA 64/256,0.791,-0.105
+Donchian 250,0.694,-0.125
+TSMOM 126d,0.687,0.05

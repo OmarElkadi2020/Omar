@@ -100,3 +100,14 @@ not significantly; it does not beat the best baseline of each group except in cr
 **Bottom line:** the classifier is a clean, low-turnover trend filter that roughly matches the best simple
 rules and cuts drawdown versus buy & hold in crypto, but it is not a source of alpha: no market group shows
 a significant, consistent edge over EMA200 or over buy & hold.
+
+## Stage 8 — best FX filter (G10 vs USD, daily 1974-2026), pre-registered
+`prereg/PREREG_stage8_fx.md`, `prereg/PREREG_stage8b_fx_carry.md`, `results_stage8_fx_trend.csv`,
+`results_stage8b_fx_carry.csv`, `stage8_fx.png`.
+- 8 (14 trend filters: TSMOM, EMA cross, Donchian, continuous trend, ensemble): every one had dev Sharpe 0.69–1.11
+  in 1974-2004; out of sample 2005-2026 all but two are negative. Selected (continuous trend): 1.11 -> -0.11
+  (buy & hold short-USD -0.24; difference CI [-0.41, +0.77]). Oanda pairs 2006-2020 check: 0.16 vs -0.17.
+- 8b (11 carry / cross-sectional filters, JST annual rates, test to 2020): selected (carry filtered by trend)
+  1.06 -> -0.07; plain carry -0.08; cross-sectional momentum -0.4 to -0.7; dollar carry -0.34.
+- Verdict: the classic FX premia (trend, carry, momentum) were strong until ~2004 and have not paid since,
+  consistent with the literature on their decay. No pre-registered filter beats the FX market out of sample.
