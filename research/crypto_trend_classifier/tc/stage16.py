@@ -18,7 +18,9 @@ CFG = dict(
     crypto=dict(cost=0.001, top=100, min_hist=60, train_end='2021-01-01', val=('2021-01-01', '2022-01-01'),
                 test=('2022-01-01', '2026-09-01'), years=range(2022, 2027), bpy=365),
     stocks=dict(cost=0.0005, top=None, min_hist=252, train_end='2006-01-01', val=('2006-01-01', '2011-01-01'),
-                test=('2011-01-01', '2026-09-23'), years=range(2011, 2027), bpy=252))
+                test=('2011-01-01', '2026-09-23'), years=range(2011, 2027), bpy=252),
+    india=dict(cost=0.0015, top=500, min_hist=252, min_px=10.0, train_end='2006-01-01', val=('2006-01-01', '2011-01-01'),
+               test=('2011-01-01', '2026-09-25'), years=range(2011, 2027), bpy=252))
 HS = (3, 7, 14, 30)
 TZ = 'UTC'
 
@@ -44,6 +46,26 @@ def load_crypto():
     ex.index = ex.index.normalize() - pd.Timedelta('1D')
     P['EX'] = ex.reindex(P['C'].index)
     return P, P4
+
+
+def load_india():
+    O, H, L, C, V, A = {}, {}, {}, {}, {}, {}
+    for f in sorted(glob.glob('nse/*_NS.parquet')):
+        d = pd.read_parquet(f)
+        d = d[~d.index.duplicated()].sort_index()
+        if len(d) < 300:
+            continue
+        s = os.path.basename(f)[:-11]
+        O[s], H[s], L[s], C[s], V[s], A[s] = d.Open, d.High, d.Low, d.Close, d.Volume.astype(float), d['Adj Close']
+    P = {k: pd.DataFrame(v).sort_index() for k, v in dict(O=O, H=H, L=L, C=C, V=V, A=A).items()}
+    for k in P:
+        P[k].index = pd.DatetimeIndex(P[k].index).tz_localize(TZ)
+    for k in ('O', 'H', 'L', 'C', 'A'):
+        P[k] = P[k].where(P[k] > 0)
+    P['V'] = P['V'].where(P['C'].notna())
+    P['DV'] = P['C'] * P['V']
+    P['EX'] = (P['O'] * P['A'] / P['C']).shift(-1)
+    return P
 
 
 def load_stocks():
@@ -156,14 +178,21 @@ def build(market):
     if market == 'crypto':
         P, P4 = load_crypto()
     else:
-        P = load_stocks()
+        P = load_stocks() if market == 'stocks' else load_india()
     C = P['C']
     r = np.log(C).diff().clip(-1, 1)
     hist = C.notna().cumsum()
     elig = (hist >= cfg['min_hist']) & C.notna() & P['EX'].notna()
+    if cfg.get('min_px'):
+        elig = elig & (C >= cfg['min_px']) & (P['DV'] > 0)
     if cfg['top']:
         dvm = P['DV'].rolling(30, min_periods=10).median().where(elig)
         elig = elig & (dvm.rank(axis=1, ascending=False) <= cfg['top'])
+    if market == 'india':          # keep only assets/dates that are ever in the universe (memory)
+        keep = elig.any()
+        t0 = elig.any(axis=1).idxmax() - pd.Timedelta('600D')
+        P = {k: v.loc[t0:, keep[keep].index] for k, v in P.items()}
+        C, r, elig = P['C'], r.loc[t0:, keep[keep].index], elig.loc[t0:, keep[keep].index]
     mkt = r.where(elig).mean(axis=1)
     lags = (1, 3, 7, 14, 30, 60, 90, 180) if market == 'crypto' else (1, 3, 7, 14, 30, 60, 90, 180, 252)
     F = daily_features(P, mkt, lags)

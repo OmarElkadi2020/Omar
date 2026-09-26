@@ -5,9 +5,15 @@ import sys
 import numpy as np
 import pandas as pd
 import lightgbm as lgb
-from .stage16 import (load_stocks, xrank, book, run_book, alpha, stats, params, CD, TZ, EMB, factors, CFG)
+from .stage16 import (load_stocks, load_india, xrank, book, run_book, alpha, stats, params, CD, TZ, EMB, factors, CFG)
 
-H, HOLD, COST, BPY = 21, 21, 0.0005, 252
+H, HOLD, BPY = 21, 21, 252
+MARKET = 'stocks'
+COST = 0.0005
+LONG_ONLY_PRIMARY = False
+TAG = 'stocks17'
+FROZEN = 'FROZEN_stage17.json'
+OUT = 'stage17_stocks'
 MAS = (3, 5, 10, 20, 50, 100, 200, 400)
 TRAIN_END = pd.Timestamp('2006-01-01', tz=TZ)
 V0, V1 = pd.Timestamp('2006-01-01', tz=TZ), pd.Timestamp('2011-01-01', tz=TZ)
@@ -20,9 +26,9 @@ def roll_beta(r, m, n):
 
 
 def build():
-    X = pd.read_pickle(f'{CD}/stocks_X.pkl')
-    D = pd.read_pickle(f'{CD}/stocks_P.pkl')
-    P = load_stocks()
+    X = pd.read_pickle(f'{CD}/{MARKET}_X.pkl')
+    D = pd.read_pickle(f'{CD}/{MARKET}_P.pkl')
+    P = load_stocks() if MARKET == 'stocks' else load_india()
     elig = D['elig']
     C = P['C'].reindex(index=elig.index, columns=elig.columns)
     Hh = P['H'].reindex(index=elig.index, columns=elig.columns)
@@ -52,15 +58,15 @@ def build():
     N = pd.concat(new, axis=1)
     N.index.names = ['date', 'asset']
     X = X.drop(columns=[c for c in X.columns if c.startswith('y')]).join(N, how='left').join(ctx, on='date')
-    X.to_pickle(f'{CD}/stocks17_X.pkl')
+    X.to_pickle(f'{CD}/{TAG}_X.pkl')
     trend = pd.concat([xrank(np.log(C / C.rolling(L, min_periods=max(2, L // 2)).mean()), elig) for L in MAS]).groupby(level=0).mean()
-    trend.astype(np.float32).to_pickle(f'{CD}/stocks17_trend.pkl')
+    trend.astype(np.float32).to_pickle(f'{CD}/{TAG}_trend.pkl')
     print(X.shape, X['y21r'].notna().sum(), flush=True)
 
 
 def load():
-    X = pd.read_pickle(f'{CD}/stocks17_X.pkl')
-    D = pd.read_pickle(f'{CD}/stocks_P.pkl')
+    X = pd.read_pickle(f'{CD}/{TAG}_X.pkl')
+    D = pd.read_pickle(f'{CD}/{MARKET}_P.pkl')
     D['rex'] = np.expm1(D['rex'].astype(float))
     return X, D
 
@@ -75,9 +81,9 @@ _F = {}
 
 def controls(D):
     if 'F' not in _F:
-        F = factors(D, 'stocks')
+        F = factors(D, MARKET)
         F['UMD_VM'] = vol_manage(F['UMD'])
-        trend = pd.read_pickle(f'{CD}/stocks17_trend.pkl').reindex(D['rex'].index)
+        trend = pd.read_pickle(f'{CD}/{TAG}_trend.pkl').reindex(D['rex'].index)
         F['TREND'], _ = run_book(book(trend.where(D['elig']), q=1 / 3), D['rex'], 0.0)
         _F['F'] = F
     return _F['F']
@@ -127,8 +133,11 @@ def tune():
                  bf=trial.suggest_float('bf', 0.3, 1.0), l2=trial.suggest_float('l2', 1e-3, 100, log=True))
         m, cols = fit(X, TRAIN_END, p)
         S = predict(m, cols, X, V0, V1)
-        _, _, ls, _ = books(S, D, V0, V1)
-        vm = vol_manage(ls)          # first ~60 days dropped: the vol estimate must come from the strictly past book
+        Sw, rex, ls, _ = books(S, D, V0, V1)
+        if LONG_ONLY_PRIMARY:
+            vm = run_book(book(Sw, long_only=True), rex, COST, HOLD)[0].loc[ls.index[0]:]
+        else:
+            vm = vol_manage(ls)      # first ~60 days dropped: the vol estimate must come from the strictly past book
         a, t, _ = alpha(vm, F.loc[vm.index])
         log.append(dict(p, t=t, alpha_ann=a * BPY, sharpe=stats(vm, BPY)['sharpe']))
         print(trial.number, round(t, 2), round(a * BPY, 3), round(log[-1]['sharpe'], 2), p, flush=True)
@@ -138,13 +147,13 @@ def tune():
     optuna.logging.set_verbosity(optuna.logging.WARNING)
     st.optimize(obj, n_trials=20)
     json.dump(dict(params=st.best_params, dev_t=st.best_value, trials=log, frozen_at=str(pd.Timestamp.utcnow())),
-              open('FROZEN_stage17.json', 'w'), indent=1, default=str)
+              open(FROZEN, 'w'), indent=1, default=str)
     print('BEST', st.best_params, st.best_value, flush=True)
 
 
 def test():
     from .stage10 import splits
-    p = json.load(open('FROZEN_stage17.json'))['params']
+    p = json.load(open(FROZEN))['params']
     X, D = load()
     F = controls(D)
     parts = []
@@ -154,7 +163,7 @@ def test():
         parts.append(predict(m, cols, X, lo, hi))
         print(Y, flush=True)
     S = pd.concat(parts)
-    S.to_pickle(f'{CD}/stocks17_scores.pkl')
+    S.to_pickle(f'{CD}/{TAG}_scores.pkl')
     rows = []
 
     def add(name, x, extra=None):
@@ -165,7 +174,15 @@ def test():
     Sw, rex, ls, to = books(S, D, T0 - pd.Timedelta('400D'), T1)   # scores before T0 are NaN; warm-up only
     ls = ls.loc[T0:]
     vm = vol_manage(ls)
-    add('PRIMARY vol-managed long-short', vm, dict(turnover_day=float(to.loc[T0:].mean())))
+    lo_only = run_book(book(Sw, long_only=True), rex, COST, HOLD)[0].loc[T0:]
+    if LONG_ONLY_PRIMARY:
+        add('PRIMARY long-only top 20%', lo_only)
+        add('vol-managed long-short', vm, dict(turnover_day=float(to.loc[T0:].mean())))
+        add(f'long-only, costs {int(COST * 1e4) + 10}bp', run_book(book(Sw, long_only=True), rex, COST + 0.001, HOLD)[0].loc[T0:])
+        add('long-only +1 day delay', run_book(book(Sw.shift(1), long_only=True), rex, COST, HOLD)[0].loc[T0:])
+        vm = lo_only
+    else:
+        add('PRIMARY vol-managed long-short', vm, dict(turnover_day=float(to.loc[T0:].mean())))
     add('unscaled long-short', ls)
     add('long-only top 20%', run_book(book(Sw, long_only=True), rex, COST, HOLD)[0].loc[T0:])
     add('costs 10bp (unscaled)', run_book(book(Sw), rex, 0.001, HOLD)[0].loc[T0:])
@@ -179,14 +196,16 @@ def test():
     for y, g in vm.groupby(vm.index.year):
         a, t, _ = alpha(g, F.loc[g.index])
         yr.append(dict(year=y, alpha_ann=a * BPY, t=t, **stats(g, BPY)))
-    R.to_csv('results_stage17_stocks.csv', index=False)
-    pd.DataFrame(yr).to_csv('results_stage17_stocks_years.csv', index=False)
-    pd.concat([vm.rename('vm_long_short'), ls.rename('long_short'), F.loc[T0:]], axis=1).to_pickle(f'{CD}/stocks17_returns.pkl')
+    R.to_csv(f'results_{OUT}.csv', index=False)
+    pd.DataFrame(yr).to_csv(f'results_{OUT}_years.csv', index=False)
+    pd.concat([vm.rename('vm_long_short'), ls.rename('long_short'), F.loc[T0:]], axis=1).to_pickle(f'{CD}/{TAG}_returns.pkl')
     pd.set_option('display.width', 250)
     print(R.round(3).to_string())
     print(pd.DataFrame(yr).round(3).to_string())
     print({k: round(stats(F[k].loc[T0:], BPY)['sharpe'], 2) for k in F})
-    print('PRIMARY stage17:', bool(R.iloc[0].alpha_ann > 0 and R.iloc[0].alpha_t >= 3.5))
+    mk = F['MKT'].loc[T0:]
+    print('EW market', stats(mk, BPY), ' long-only', stats(lo_only, BPY))
+    print('PRIMARY:', bool(R.iloc[0].alpha_ann > 0 and R.iloc[0].alpha_t >= (3.0 if LONG_ONLY_PRIMARY else 3.5)))
 
 
 if __name__ == '__main__':
