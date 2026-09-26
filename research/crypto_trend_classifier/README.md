@@ -222,3 +222,20 @@ H = 21 days, residual target, Han-Zhou-Zhu MA signals, 52-week high, residual mo
 controls add vol-managed UMD and a trend factor. 2011-2026: α 1.9 %/yr, **t 0.8**; unscaled t 0.06; long-only
 t 1.0; top-50 t −0.3. Everything the model finds in US large/mid caps is already in UMD / UMD_VM / SIZE.
 As pre-registered, no further attempt is made on this stock window.
+
+## Stage 18 — same stock procedure on a never-touched market: India NSE (pre-registered) — **MET**
+`prereg/PREREG_stage18_india_fresh_universe.md`, `tc/stage18.py`, `results_stage18_india*.csv`,
+`stage16_crypto_india17.png`. All ~2,577 NSE symbols, top-500 by traded value each day, next-open execution,
+15 bp costs, dev 2006-2010 only, annual refits 2011-2026.
+* **Primary (long-only top 20 %): α 8.6 %/yr, NW t 5.15** vs MKT + SIZE + UMD + STREV + LOWVOL + UMD_VM + TREND.
+  CAGR 31 % vs 17.4 % for the equal-weight universe; Sharpe 1.52 vs 0.86; max DD −39 % vs −57 %.
+* Secondary: 25 bp costs t 4.4; +1 day delay t 4.9; long-short t 6.4 (vol-managed Sharpe 1.95).
+* Honest limits (`results_stage18_india_survivorship_checks.csv`): α shrinks with liquidity (top-300 t 3.1,
+  top-200 t 2.3, **top-100 t 0.3**) and with time (2011-18 α 13.8 % t 5.7; 2019-26 α 4.4 % t 2.2). The data holds
+  today's listings only, so part of the α may be survivorship; the edge lives in mid/small caps.
+
+## Overall verdict of stages 15-18
+* Single-asset trend timing: no alpha beyond classic trend rules (stage 15).
+* Relative (cross-sectional) trend prediction: **real, out-of-sample alpha in crypto** (survivorship-free,
+  robust to perps-only shorts + funding) and **in Indian stocks** (with the caveats above); **none in US
+  large/mid caps** once known factors are controlled (two pre-registered attempts).
