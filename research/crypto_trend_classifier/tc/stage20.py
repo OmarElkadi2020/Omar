@@ -47,7 +47,10 @@ def indicators(P):
         f = pd.DataFrame(dict(high=H[s], low=L[s], close=C[s])).dropna()
         if len(f) < 60:
             continue
-        st[s] = pd.Series(supertrend(f, 10, 3.0) == 1, index=f.index)
+        try:
+            st[s] = pd.Series(supertrend(f, 10, 3.0) == 1, index=f.index)
+        except ZeroDivisionError:          # zero-range bars (bad data)
+            st[s] = pd.Series(False, index=f.index)
         a = adx(f, 14)
         up, dn = f.high.diff(), -f.low.diff()
         pdm = pd.Series(np.where((up > dn) & (up > 0), up, 0.0), f.index).ewm(alpha=1 / 14, adjust=False).mean()

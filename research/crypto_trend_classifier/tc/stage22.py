@@ -26,7 +26,10 @@ def st_frame(C, H_, L, n, m):
         f = pd.DataFrame(dict(high=H_[s], low=L[s], close=C[s])).dropna()
         if len(f) < n + 2:
             continue
-        v = pd.Series(supertrend(f, n, m).astype(np.float32), index=f.index)
+        try:
+            v = pd.Series(supertrend(f, n, m).astype(np.float32), index=f.index)
+        except ZeroDivisionError:          # zero-range bars (bad data) -> feature missing for this asset
+            continue
         # causal availability: hide values until `need` bars of history exist AT THAT DATE
         # (a total-length check would leak whether the asset survives into the future)
         S[s] = v.where(np.arange(len(v)) >= need)
