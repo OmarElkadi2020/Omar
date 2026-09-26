@@ -12,19 +12,30 @@ COINS = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGE
 COST, BPY = 0.001, 365
 T0, T1 = pd.Timestamp('2022-01-01', tz=TZ), pd.Timestamp('2026-09-01', tz=TZ)
 BENCH = ['EMA50', 'EMA200', 'GOLDEN', 'MACD', 'TSMOM30', 'TSMOM90', 'DONCHIAN20_10', 'SUPERTREND10_3', 'ADX25_DI']
-GRID = [(sp, ti, to) for sp in (1, 3, 7, 14) for ti in (0.5, 0.55, 0.6) for to in (0.4, 0.45, 0.5) if to <= ti]
+GRID = [(sp, ti, to) for sp in (1, 3, 7, 14) for ti in (-0.05, 0.0, 0.05) for to in (-0.1, -0.05, 0.0) if to <= ti]
 
 
-def devprobs():
+def centred_probs(years, fn):
     p = json.load(open('FROZEN_stage20.json'))['params']
     X, D = s20.load()
     parts = []
-    for Y in (2019, 2020, 2021):
-        lo, hi = pd.Timestamp(f'{Y}-01-01', tz=TZ), pd.Timestamp(f'{Y + 1}-01-01', tz=TZ)
+    for Y in years:
+        lo, hi = pd.Timestamp(f'{Y}-01-01', tz=TZ), min(pd.Timestamp(f'{Y + 1}-01-01', tz=TZ), T1)
         m, cols = s20.fit(X, p['H'], lo, p)
-        parts.append(s20.predict(m, cols, X, lo, hi))
-        print(Y, flush=True)
-    pd.concat(parts).to_pickle(f'{CD}/stage21_devprobs.pkl')
+        d = X.index.get_level_values(0)
+        tr = (d + pd.Timedelta(days=int(p['H'] * 1.5) + 2) < lo - s20.EMB) & X[f"fwd{p['H']}"].notna().values
+        b = float(m.predict(X.loc[tr, cols].values).mean())          # model's own training base rate
+        parts.append(s20.predict(m, cols, X, lo, hi) - b)
+        print(Y, round(b, 4), flush=True)
+    pd.concat(parts).to_pickle(f'{CD}/{fn}')
+
+
+def devprobs():
+    centred_probs((2019, 2020, 2021), 'stage21_devprobs.pkl')
+
+
+def testprobs():
+    centred_probs(range(2022, 2027), 'stage21_testprobs.pkl')
 
 
 def state(P, span, tin, tout):
@@ -108,7 +119,7 @@ def test():
     p = json.load(open('FROZEN_stage21.json'))['params']
     X, D = s20.load()
     rex, live = ctx(D, T0, T1)
-    P = pd.read_pickle(f'{CD}/crypto20_probs.pkl').unstack()[COINS].reindex(rex.index)
+    P = pd.read_pickle(f'{CD}/stage21_testprobs.pkl').unstack()[COINS].reindex(rex.index)
     st = state(P, p['span'], p['th_in'], p['th_out'])
     r, to = portfolio(st, rex, live)
     B = bench(D, rex, live)
@@ -148,4 +159,4 @@ def test():
 
 
 if __name__ == '__main__':
-    dict(devprobs=devprobs, tune=tune, test=test)[sys.argv[1]]()
+    dict(devprobs=devprobs, testprobs=testprobs, tune=tune, test=test)[sys.argv[1]]()
