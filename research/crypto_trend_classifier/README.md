@@ -313,3 +313,17 @@ best = SuperTrend(48, 4). Test 2024-01…2026-08 on BTC ETH BNB SOL XRP ADA DOGE
 Primary (≥ +0.05 MCC, ≥ 20 % faster, no more flips): **not met** (ΔMCC −0.02, 4/10 coins, 34 % slower).
 Derivatives data added ≈ +0.01 MCC over price only; the cross-market block hurt. A well-chosen SuperTrend remains as
 accurate and faster than any model we could build from price, flow and positioning data.
+
+## Stage 26 — meta-labeling SuperTrend as a 1h long trend filter (pre-registered) — not met
+SuperTrend on 1h gives the side; a LightGBM meta-model (1h + 4h price, order flow, derivatives, cross-market,
+event context; 475 features, truncation leak test 0) accepts or rejects each up-flip. Dev 2022-23, test 2024-01…2026-08,
+10 majors (`PREREG_stage26_metalabel_supertrend_1h.md`, `FROZEN_stage26.json`).
+* **First run leaked** (event end times in ms compared with a cutoff in ns → test events entered training): Sharpe 5.6,
+  precision 0.76 — invalid, kept as `*_LEAKBUG.*`. Fixed with an assertion on training rows; re-tuned; hurdle raised
+  (amendment 1).
+* Clean dev: meta objective 0.366 vs plain SuperTrend(48,4) 0.361; most trials chose τ ≈ 0.2 (accept nearly all).
+* Test: median MCC META 0.352 vs plain ST(48,4) 0.371 (**−0.019, wins 1/10**); signal precision 0.390 vs 0.384;
+  long-only Sharpe 0.72 vs 0.60 (max DD −42 % vs −47 %); flips/true flip 2.08 vs 2.32; delay equal (18 bars).
+  Only endpoint 3 held → **primary not met**. Ablation without 4h flow/derivatives/cross: MCC 0.374 (≈ plain ST).
+* Verdict: on correctly separated data the meta-model cannot tell good SuperTrend(48,4) flips from bad ones better
+  than chance; it slightly reduces false flips and drawdown at the cost of accuracy. Plain SuperTrend(48,4) stays.
