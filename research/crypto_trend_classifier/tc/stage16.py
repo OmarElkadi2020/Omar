@@ -184,11 +184,11 @@ def build(market):
     hist = C.notna().cumsum()
     elig = (hist >= cfg['min_hist']) & C.notna() & P['EX'].notna()
     if cfg.get('min_px'):
-        elig = elig & (C >= cfg['min_px']) & (P['DV'] > 0)
+        elig = elig & (P.get('RAW', C) >= cfg['min_px']) & (P['DV'] > 0)   # raw price, not split-adjusted
     if cfg['top']:
         dvm = P['DV'].rolling(30, min_periods=10).median().where(elig)
         elig = elig & (dvm.rank(axis=1, ascending=False) <= cfg['top'])
-    if market == 'india':          # keep only assets/dates that are ever in the universe (memory)
+    if market.startswith('india'):          # keep only assets/dates that are ever in the universe (memory)
         keep = elig.any()
         t0 = elig.any(axis=1).idxmax() - pd.Timedelta('600D')
         P = {k: v.loc[t0:, keep[keep].index] for k, v in P.items()}

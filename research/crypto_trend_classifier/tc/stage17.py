@@ -157,7 +157,7 @@ def test():
     X, D = load()
     F = controls(D)
     parts = []
-    for Y in range(2011, 2027):
+    for Y in range(T0.year, 2027):
         lo, hi = pd.Timestamp(f'{Y}-01-01', tz=TZ), pd.Timestamp(f'{Y + 1}-01-01', tz=TZ)
         m, cols = fit(X, lo, p)
         parts.append(predict(m, cols, X, lo, hi))

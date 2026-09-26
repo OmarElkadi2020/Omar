@@ -34,3 +34,12 @@ the same survivorship-free universe, 2014-01 … 2026-09.
 Delisting-return sensitivity (0 %, −100 %); number of held stocks that got delisted; the same model evaluated
 on the survivor-only subset of this data (stocks still trading at the end) to measure the bias directly;
 top-300 / top-200 / top-100 liquidity subsets; per-year α; long-short book.
+
+## Amendment 1 (data cleaning, before any model or return is computed)
+Validation against Yahoo showed bhavcopy PREV_CLOSE is **not** adjusted on ex-dates. Fixes:
+1. Bonus (a:b → ×(a+b)/b) and split (a:b face value → ×a/b) factors from the NSE corporate-action master
+   (aswinv90 dataset, 1990→2026) are applied on the ex-date (next trading day if the ex-date was not traded);
+   preference-share (NCRPS) bonuses are ignored. After this, 6 large caps match Yahoo with daily corr ≥ 0.99.
+2. NSE price bands make one-day moves > 35 % essentially impossible outside corporate actions, so any remaining
+   day with |close/prev_close − 1| > 35 % (not the first day of a symbol) is treated as an unrecorded corporate
+   action: the overnight gap is removed and only that day's open→close return is kept.
