@@ -297,3 +297,19 @@ over time, ~1,700/day; 707 held names later delisted), 20 bp costs, 2011-2026.
   less-liquid half t 0.65; long-short t 0.41.
 Verdict: the Indian small/mid-cap α does not carry over to US small caps (a market with far more quant capital),
 even though the partial survivorship of this dataset would, if anything, favour the model.
+
+## Stage 25 — every available feature vs the indicators on accuracy AND speed (pre-registered) — not met
+`prereg/PREREG_stage25_all_features_speed_accuracy.md`, `tc/stage25.py`, `results_stage25_*.csv`. 20 Binance coins, 4h,
+260 features: stage-12 price set + order flow (taker-buy share, trades, perp/spot volume) + derivatives (funding,
+open interest, top-trader / global long-short ratios, taker L/S, perp basis) + cross-market (BTC derivatives, ETH/BTC,
+top-100 breadth). Leak test 0. Truth = oracle B1 on 4h. 57 indicator settings tuned on the same dev years (2022-23);
+best = SuperTrend(48, 4). Test 2024-01…2026-08 on BTC ETH BNB SOL XRP ADA DOGE LINK AVAX TRX:
+| | median MCC | delay (4h bars) | missed move | flips / true flip |
+|---|---|---|---|---|
+| **SuperTrend(48,4)** | **0.379** | **16.0** | 0.397 | 2.15 |
+| model, all blocks | 0.357 | 21.5 | 0.415 | 2.17 |
+| model, price + flow + derivatives | 0.387 | 21.5 | 0.418 | 2.12 |
+| model, price only | 0.374 | 21.8 | 0.406 | 2.14 |
+Primary (≥ +0.05 MCC, ≥ 20 % faster, no more flips): **not met** (ΔMCC −0.02, 4/10 coins, 34 % slower).
+Derivatives data added ≈ +0.01 MCC over price only; the cross-market block hurt. A well-chosen SuperTrend remains as
+accurate and faster than any model we could build from price, flow and positioning data.
