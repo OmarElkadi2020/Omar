@@ -287,3 +287,13 @@ master; 1,810 unrecorded gaps (> 35 %, impossible under price bands) neutralised
 * Survivorship effect: the same model on survivors only α 5.8 % (t 3.44); stage 18 (survivor data) over the same
   2014-26 years averaged ≈ 6.8 %/yr -> survivorship inflated stage 18 by roughly 1.5 %/yr, not by all of it.
 * Limits: top-300 liquid t 1.95, top-200 t 1.33, top-100 t −0.9; per-year α ≈ 0-3 % since 2022.
+
+## Stage 24 — the India long-only procedure on US small caps (pre-registered, frozen stage-18 params) — not met
+`prereg/PREREG_stage24_us_smallcaps.md`, `tc/stage24.py`, `results_stage24_us_sc*.csv`. Hugging Face defeatbeta Yahoo
+data, 12,354 symbols 1994-2026; Russell-2000-like universe = liquidity ranks 1,001-3,000, price ≥ $5 (6,506 names
+over time, ~1,700/day; 707 held names later delisted), 20 bp costs, 2011-2026.
+* Primary long-only top 20 %: **α 0.9 %/yr, t 0.34**; CAGR 9.4 % vs EW universe 9.7 %.
+* 40 bp t −0.60; delisting 0 % / −100 % t 0.31 / 0.40; survivors only t 0.56; more-liquid half t −0.03,
+  less-liquid half t 0.65; long-short t 0.41.
+Verdict: the Indian small/mid-cap α does not carry over to US small caps (a market with far more quant capital),
+even though the partial survivorship of this dataset would, if anything, favour the model.
