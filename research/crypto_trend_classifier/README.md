@@ -340,3 +340,17 @@ choice = centre of the best 3×3 plateau (not the raw argmax); test 2024-01…20
 * Recommended (trend accuracy, fewest false signals): 5m/15m/30m/1h **(100, 6)**, 2h **(100, 5)**, 4h **(48, 5)**,
   8h **(30, 4)**, 12h **(20, 4)**, 1d **(48, 6)**. On 5m-1h the choice sits at the grid edge (slower may be better);
   5m long-filter Sharpe is negative after 10 bp costs on every setting.
+
+## Stage 28 pre-check (dev 2019-23 only, test untouched) — can choppiness / momentum veto false SuperTrend down-flips?
+False down-flip = within 30 days the high exceeds the peak of the up-segment that just ended (stage-27 settings).
+* False share: 1h 67 %, 4h 48 %, 8h 40 %, 1d 8 % (9 of 107): the timeframe/setting is the biggest lever.
+* Separation at the flip (AUC for "false"): 4h and 8h ≤ 0.54 with unstable sign across years (chop14/50, RSI, ROC,
+  ADX, MACD, EMA distance, daily-trend state); 1h best 0.575 (up-segment gain, chop14), stable sign but weak.
+  1d AUCs of ~0.75 rest on 9 false events and are not usable.
+* Vetoing the top-25 % chop14 1h flips: false share 72 % vs 67 %; the vetoed flips still lose ≥ 29 % in 30 days
+  in their worst 10 %.
+* Re-entering when price breaks the old peak is useless: SuperTrend already flips back up earlier in 100 % of cases
+  (median 48-56 h before the break, 5-9 % cheaper).
+* Cost of a false exit (exit → SuperTrend re-entry, 20 bp): 1h −5.5 %, 4h −11.5 %, 8h −14.6 % (median); gain of a
+  true exit: +4 %…+7 % median, +8 %…+13 % mean (fat tail). A veto pays only if P(false) > ≈51 % (4h), 61 % (1h).
+* Verdict: no filter worth pre-registering for 4h/8h; the 1h signal is too weak (the stage-26 study needs AUC ≈ 0.65).
