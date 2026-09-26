@@ -35,3 +35,11 @@ Each coin is a fixed 10 % slot; the slot is in the coin when its filter is ON, e
 Mean forward 7- and 30-day return when ON vs when OFF; share of the worst 30-day drawdowns avoided
 (OFF at the start of a 30-day window that falls > 20 %); share of 30-day rallies > 20 % captured
 (ON at the start); flips per coin per year; time in market; per-coin Sharpe wins vs each benchmark.
+
+## Amendment 1 (dev only, before any test number)
+On the dev folds the raw p of the 2019/2020 models never crossed 0.5 (models trained on the 2018 bear market
+are shifted down; magnitude-weighted binary loss is not calibrated), so the filter was never ON. Change:
+each yearly model's own base rate b_Y = mean predicted p on its training rows (known at training time) is
+subtracted: `s = EWM_span(p − b_Y)`, ON when s > δ_in, OFF when s < δ_out. Grid: span ∈ {1,3,7,14},
+δ_in ∈ {−0.05, 0, 0.05}, δ_out ∈ {−0.10, −0.05, 0} with δ_out ≤ δ_in. Everything else unchanged. The test
+models are re-fitted with the frozen stage-20 params (deterministic, same p) to obtain their b_Y.
