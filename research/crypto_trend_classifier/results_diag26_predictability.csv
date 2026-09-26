@@ -1,0 +1,10 @@
+year,target,auc,top_features
+2024,y_dir,0.5249880666094819,"h4_cross_mkt_ret_30, h4_cross_disp_30, h4_cross_btc_oi_to_vol, h4_cross_breadth_ema50, h4_cross_ethbtc_ema180"
+2024,y_size,0.5901460222890124,"h4_cross_ethbtc_ema180, h1flow_trades_z, h4_cross_disp_30, h4_cross_mkt_ret_30, h4_cross_btc_oi_to_vol"
+2024,y_state,0.811625005162162,"h1_don_pos_96, h1_ru_96, h1_st_24_4.0, h1_ema_dist_50, h1_dc_1.0"
+2025,y_dir,0.5267917166222661,"h4_cross_mkt_ret_30, h4_cross_disp_30, h4_cross_btc_oi_to_vol, h4_price_mkt_mom_252, h4_cross_ethbtc_ema180"
+2025,y_size,0.5794942025757654,"h1_atrp_z_14, h1flow_trades_z, h4_cross_btc_oi_to_vol, h4_cross_disp_30, h4_cross_mkt_ret_30"
+2025,y_state,0.766979146583203,"h1_ru_96, h1_don_pos_96, h1_st_24_4.0, h1_ema_dist_50, h4_cross_btc_oi_to_vol"
+2026,y_dir,0.5350306882897811,"h4_cross_disp_30, h4_cross_mkt_ret_30, h4_cross_btc_oi_to_vol, h4_cross_breadth_ema50, h4_price_mkt_mom_252"
+2026,y_size,0.5773534068237693,"h1flow_trades_z, h1_atrp_z_14, h4_cross_btc_oi_to_vol, h4_cross_disp_30, h4_cross_ethbtc_ema180"
+2026,y_state,0.7565677962709509,"h1_ru_96, h1_don_pos_96, h1_st_24_4.0, h1_ema_dist_50, h1_dc_1.0"
