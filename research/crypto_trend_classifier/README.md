@@ -275,3 +275,15 @@ survival leak in SuperTrend availability. Benchmarks now include a no-ML VOTE (�
 Verdict after stages 12-15 and 20-22: for single-asset trend filtering, our ML models never beat the classic
 filters out of sample; the extra information they use does not survive. Simple filters remain the honest choice:
 crypto — EMA200 / Donchian 20/10 / EMA50; India — golden cross (1.3 flips per stock-year) or buy & hold.
+
+## Stage 23 — India long-only alpha on SURVIVORSHIP-FREE data (pre-registered, frozen stage-18 model) — met, smaller
+`prereg/PREREG_stage23_india_survivorship_free.md` (+ data-cleaning amendment), `tc/stage23.py`, `results_stage23_*.csv`.
+NSE daily bhavcopy 2010-2026 (github tilak999/NSE-Data-bank): 3,829 symbol chains, 496 renames linked, 875 delisted
+(305 of them entered the top-500 universe; 169 were actually held). Bonus/split factors from the NSE corporate-action
+master; 1,810 unrecorded gaps (> 35 %, impossible under price bands) neutralised; −30 % delisting return.
+* **Primary (long-only top 20 %, 2014-01…2026-09): α 5.3 %/yr, NW t 3.12** (hurdle 3.0) — CAGR 27.6 % vs 17.9 % EW,
+  Sharpe 1.32 vs 0.87, max DD −41 % vs −59 %.
+* Delisting return 0 % t 3.32; **−100 % t 2.66**; 25 bp costs t 2.29; +1 day delay t 3.01; long-short t 4.04.
+* Survivorship effect: the same model on survivors only α 5.8 % (t 3.44); stage 18 (survivor data) over the same
+  2014-26 years averaged ≈ 6.8 %/yr -> survivorship inflated stage 18 by roughly 1.5 %/yr, not by all of it.
+* Limits: top-300 liquid t 1.95, top-200 t 1.33, top-100 t −0.9; per-year α ≈ 0-3 % since 2022.
