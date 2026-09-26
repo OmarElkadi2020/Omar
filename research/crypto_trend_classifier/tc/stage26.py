@@ -175,7 +175,7 @@ def events():
             E['t'] = f.index[ups]
             E['end'] = end
             E['lab_end'] = lab_end
-            E['lab_end_t'] = np.where(finished, f.index[le].asi8, np.iinfo(np.int64).max)
+            E['lab_end_t'] = pd.Series(f.index[le], index=E.index).where(finished)      # NaT while unfinished
             E['ret'] = np.log(c_[le] / c_[ups])
             X = f[feat].iloc[ups].reset_index(drop=True)
             X.index = E.index
@@ -247,10 +247,10 @@ def oracle_at(c, f, cut):
 
 def train_set(EV, closes, cut, label):
     """events whose label is known EMB bars before cut."""
-    lim = (cut - EMB * H1).value
+    lim = cut - EMB * H1
     Xs, ys = [], []
     for c, E in EV.items():
-        ok = (E.lab_end_t.values <= lim)
+        ok = (E.lab_end_t <= lim).fillna(False).values & (E.t < lim).values
         if label == 'oracle':
             lab, fin = oracle_at(c, closes[c], cut)
             ok &= E.lab_end.values < fin - EMB
@@ -261,7 +261,9 @@ def train_set(EV, closes, cut, label):
             y = (e.ret.values - RT_COST > 0).astype(int)
         Xs.append(e)
         ys.append(y)
-    return pd.concat(Xs), np.concatenate(ys)
+    X = pd.concat(Xs)
+    assert X.lab_end_t.max() <= lim and X.t.max() < lim, 'training event ends after the refit date'
+    return X, np.concatenate(ys)
 
 
 def lgbp(p):

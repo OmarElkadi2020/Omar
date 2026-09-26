@@ -59,3 +59,13 @@ SuperTrend(48,4) on 4h projected onto 1h bars (last completed 4h bar).
 ## Secondary
 Delay, missed move, flips per true flip, give-back; per coin, per year; truth k = 2; ablation without the 4h
 derivatives/flow/cross blocks; META vs its own unfiltered primary (the pure meta-labeling effect).
+
+## Amendment 1 (written after a leaking first run, before the corrected run)
+The first tune + test run leaked: event end times were stored in milliseconds and compared with the refit date in
+nanoseconds, so **every finished event — including dev-fold and test events — entered training** (training size was
+14,960 events at every refit). Its numbers (Sharpe 5.6, precision 0.76) are invalid and are kept only as
+`*_LEAKBUG.*` for the record. The feature leak test (0 mismatches) did not cover training-row selection.
+Fix: times compared as timestamps, plus an assertion that every training event starts and ends ≥ 24 bars before the
+refit date (training sizes now 5,116 / 7,151 / 9,234 / 11,293 / 13,499 at 2022…2026).
+Tuning is re-run from scratch on dev only. Because the test window has been touched once (through the invalid run),
+the accuracy hurdle is **raised from +0.02 to +0.03 median MCC**; the other endpoints are unchanged.
