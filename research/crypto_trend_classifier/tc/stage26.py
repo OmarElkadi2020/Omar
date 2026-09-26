@@ -503,7 +503,7 @@ def test():
     M, B = Rk[Rk.strategy == 'META'].set_index('coin'), Rk[Rk.strategy == bname].set_index('coin')
     d_mcc = M.mcc.median() - B.mcc.median()
     wins = int((M.mcc > B.mcc).sum())
-    p1 = d_mcc >= 0.02 and wins >= 7
+    p1 = d_mcc >= 0.03 and wins >= 7
     p2 = PF.loc['META', 'precision'] >= PF.loc[bname, 'precision'] + 0.05
     p3 = PF.loc['META', 'sharpe'] >= PF.loc[bname, 'sharpe']
     print(f'primary {prim} label {label} tau {tau} | BEST {bname}')
