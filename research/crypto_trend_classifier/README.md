@@ -254,3 +254,13 @@ cross, MACD, TSMOM 30/90, Donchian, SuperTrend, ADX, momentum, dual momentum, EW
 and **BTC with EMA50 filter +21 % (Sharpe 0.76)** beat it. α vs all 14 at once t 0.54 -> not met.
 Buy precision (7-day return > 0): model 48.5 % vs alt indicators 41-44 % vs BTC 52 %; "false buys" (< −5 %):
 model 32 % vs alt indicators 37-43 % vs BTC 17 %. In 2022-26 no alt-selection rule could beat simply holding BTC.
+
+## Stage 21 — the model as a long-only trend FILTER on 10 large caps (pre-registered) — not met
+`prereg/PREREG_stage21_trend_filter_majors.md` (+ dev-only amendment), `tc/stage21.py`, `results_stage21_filter*.csv`.
+BTC ETH BNB SOL XRP ADA DOGE LINK AVAX TRX, 10 % slots, cash when OFF, 2022-01…2026-08, 10 bp.
+Model filter: Sharpe 0.47, CAGR 11.4 %, max DD −61 %, 12 flips/coin/yr; α vs 9 filters + buy & hold t 0.46.
+Better filters here: EMA50 0.54, TSMOM-30 0.54, Donchian 20/10 0.53 (max DD −38 %), EMA200 0.50 (max DD −36 %,
+62 % of >20 % crashes avoided, 11.7 flips/yr). The model's ON state did **not** separate future returns
+(30-day fwd +0.4 % ON vs +4.0 % OFF) and avoided only 40 % of crashes. Its 7-day p(up) is a short-horizon
+relative signal, not a trend filter. For large-cap crypto no ML variant in stages 12-15, 20, 21 beat simple
+trend filters out of sample.
