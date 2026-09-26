@@ -207,7 +207,7 @@ def tune():
             m, cols = fit(X, p['H'], lo, p)
             r, _, _ = model_returns(predict(m, cols, X, lo, hi), D, p, lo, hi)
             a, t = evaluate(r, R)
-            ts.append(t)
+            ts.append(0.0 if not np.isfinite(t) else t)     # no position all year -> no alpha
             shs.append(stats(r, BPY)['sharpe'])
         v = float(np.mean(ts))
         log.append(dict(p, t_mean=v, t_folds=ts, sharpe_folds=shs))
