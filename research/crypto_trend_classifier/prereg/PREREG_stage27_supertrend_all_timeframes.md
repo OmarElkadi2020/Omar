@@ -45,3 +45,8 @@ C. **Volatility sizing:** position = state × min(σ* / σ̂, 2), σ̂ = trailin
 ## Secondary
 Test results per coin and per year; 10 extra coins; delay, missed move, flips per true flip; gap between the choice and
 the test-hindsight best; cross-timeframe comparison of the FILTER choices on common 1h returns; max drawdown.
+
+## Amendment 1 (before any stage-27 number was computed)
+**5m** bars (Binance 5m klines, same 20 coins) are added as a ninth timeframe on the user's request, with the same
+grid, dev folds, selection rule and test. The primary endpoints A-C stay defined on the original eight timeframes;
+5m is reported as secondary.
