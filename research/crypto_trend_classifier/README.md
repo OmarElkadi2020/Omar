@@ -264,3 +264,14 @@ Better filters here: EMA50 0.54, TSMOM-30 0.54, Donchian 20/10 0.53 (max DD −3
 (30-day fwd +0.4 % ON vs +4.0 % OFF) and avoided only 40 % of crashes. Its 7-day p(up) is a short-horizon
 relative signal, not a trend filter. For large-cap crypto no ML variant in stages 12-15, 20, 21 beat simple
 trend filters out of sample.
+
+## Stage 22 — meta trend filter (indicator states, daily + weekly, 30-day target) (pre-registered) — not met
+`prereg/PREREG_stage22_meta_trend_filter.md`, `tc/stage22.py`, `results_stage22_*.csv`. Leak test 0 after fixing a
+survival leak in SuperTrend availability. Benchmarks now include a no-ML VOTE (≥ 5 of 9 indicators ON).
+* A crypto 10 large caps 2022-26: Sharpe 0.46 vs EMA50 0.54 / TSMOM-30 0.54 / Donchian 0.53 / EMA200 0.50;
+  α t 0.64. Few flips (5.7/yr), 65 % of rallies captured, but stayed in during 2022 (−68 %).
+* B India top-100, per-stock filter, 2011-26 (fresh for this question): the tuned filter was ON 99.6 % of the time
+  (≈ buy & hold): Sharpe 0.62 vs buy & hold 0.62 vs golden cross 0.64; α t 0.62.
+Verdict after stages 12-15 and 20-22: for single-asset trend filtering, our ML models never beat the classic
+filters out of sample; the extra information they use does not survive. Simple filters remain the honest choice:
+crypto — EMA200 / Donchian 20/10 / EMA50; India — golden cross (1.3 flips per stock-year) or buy & hold.
