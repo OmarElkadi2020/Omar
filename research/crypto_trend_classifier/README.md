@@ -245,3 +245,12 @@ As pre-registered, no further attempt is made on this stock window.
 10 bp: CAGR 6.2 % vs EW-5 3.3 % and BTC 11.2 %; α vs [EW5, BTC] −0.4 %/yr, t −0.06. Top-1 / top-3 / cash filter: no α.
 The model mostly held BTC (80 % of days), ETH (65 %), BNB (44 %) — a low-volatility tilt. Five highly correlated
 majors give too little dispersion; the stage-16 edge needs a wide universe (avoiding / shorting weak alts).
+
+## Stage 20 — long-only up-trend classifier with cash vs 14 long-only benchmarks (pre-registered) — not met
+`prereg/PREREG_stage20_long_only_trend.md`, `tc/stage20.py`, `results_stage20_crypto*.csv`. Binary p(up over 7 days),
+magnitude-weighted, top-5 with p > 0.5 else cash, crypto top-100 incl. delisted, 2022-01…2026-08, 10 bp.
+Model CAGR −18.7 % (Sharpe 0.02, max DD −88 %) vs every alt-universe indicator −49 % … −71 % (EMA50/200, golden
+cross, MACD, TSMOM 30/90, Donchian, SuperTrend, ADX, momentum, dual momentum, EW) — but **BTC buy & hold +11 %**
+and **BTC with EMA50 filter +21 % (Sharpe 0.76)** beat it. α vs all 14 at once t 0.54 -> not met.
+Buy precision (7-day return > 0): model 48.5 % vs alt indicators 41-44 % vs BTC 52 %; "false buys" (< −5 %):
+model 32 % vs alt indicators 37-43 % vs BTC 17 %. In 2022-26 no alt-selection rule could beat simply holding BTC.
