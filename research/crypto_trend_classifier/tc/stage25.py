@@ -26,7 +26,9 @@ BLOCKS = ('price', 'flow', 'deriv', 'cross')
 
 # ------------------------------------------------------------------ raw data
 def spot(c):
-    return pd.read_pickle(f'{S25}/{c}_spot.pkl')
+    d = pd.read_pickle(f'{S25}/{c}_spot.pkl')
+    d.index.name = 'timestamp'          # 't' clashes with a column name inside features.join_by_close
+    return d
 
 
 def loader(name):
