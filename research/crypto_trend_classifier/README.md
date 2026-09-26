@@ -239,3 +239,9 @@ As pre-registered, no further attempt is made on this stock window.
 * Relative (cross-sectional) trend prediction: **real, out-of-sample alpha in crypto** (survivorship-free,
   robust to perps-only shorts + funding) and **in Indian stocks** (with the caveats above); **none in US
   large/mid caps** once known factors are controlled (two pre-registered attempts).
+
+## Stage 19 — long-only rotation among BTC/ETH/SOL/LINK/BNB (pre-registered, frozen stage-16 scores) — not met
+`prereg/PREREG_stage19_long_only_5coins.md`, `tc/stage19.py`, `results_stage19_5coins*.csv`. Top-2 of 5, 2022-01…2026-08,
+10 bp: CAGR 6.2 % vs EW-5 3.3 % and BTC 11.2 %; α vs [EW5, BTC] −0.4 %/yr, t −0.06. Top-1 / top-3 / cash filter: no α.
+The model mostly held BTC (80 % of days), ETH (65 %), BNB (44 %) — a low-volatility tilt. Five highly correlated
+majors give too little dispersion; the stage-16 edge needs a wide universe (avoiding / shorting weak alts).
