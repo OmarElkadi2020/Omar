@@ -327,3 +327,16 @@ event context; 475 features, truncation leak test 0) accepts or rejects each up-
   Only endpoint 3 held → **primary not met**. Ablation without 4h flow/derivatives/cross: MCC 0.374 (≈ plain ST).
 * Verdict: on correctly separated data the meta-model cannot tell good SuperTrend(48,4) flips from bad ones better
   than chance; it slightly reduces false flips and drawdown at the cost of accuracy. Plain SuperTrend(48,4) stays.
+
+## Stage 27 — robust SuperTrend settings on every timeframe + volatility sizing (pre-registered) — met (A, B, C)
+108 settings (period 5…100 × multiplier 1…6) on 9 timeframes (5m…1d), 20 coins; dev = five yearly folds 2019-23,
+choice = centre of the best 3×3 plateau (not the raw argmax); test 2024-01…2026-08 once (`PREREG_stage27_…`, `FROZEN_stage27.json`).
+* The per-year dev argmax jumps around (e.g. 4h: (60,4) (100,5) (14,5) (40,4) (60,5)); plateau choice is what survives.
+* **A (trend accuracy):** the choice is in the top 25 % of the grid on test on 8/8 timeframes and beats the default
+  SuperTrend(10,3) on 8/8. Default (10,3) has similar raw MCC but 3.1-4.1 flips per true flip; the choices have 1.1-2.2.
+* **B (long filter):** top 25 % in 6/8, beats (10,3) in 7/8.
+* **C (inverse-volatility sizing, 30-day σ, cap 2×):** Sharpe higher on 8/8 timeframes, median +0.44; max drawdown
+  roughly halved (e.g. 1h −47 % → −30 %, 4h −52 % → −25 %).
+* Recommended (trend accuracy, fewest false signals): 5m/15m/30m/1h **(100, 6)**, 2h **(100, 5)**, 4h **(48, 5)**,
+  8h **(30, 4)**, 12h **(20, 4)**, 1d **(48, 6)**. On 5m-1h the choice sits at the grid edge (slower may be better);
+  5m long-filter Sharpe is negative after 10 bp costs on every setting.
