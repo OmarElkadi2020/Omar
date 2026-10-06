@@ -46,3 +46,18 @@ discretised POLICY; per year; per coin; turnover.
 
 ## Power, said in advance
 Same as stage 29: only a Sharpe gap of about 0.6 can reach significance on 2.7 years of 5 correlated coins.
+
+## Amendment 1 (before any stage-30 dev or test result): bigger data with volume
+Network access to `data.binance.vision` was opened. Data are now Binance spot 1h klines with volume and taker-buy
+flow for 20 coins (BTC ETH BNB SOL XRP ADA DOGE LINK AVAX TRX + DOT LTC BCH ATOM NEAR UNI FIL ETC XLM AAVE),
+2019-01 … 2026-09, committed in `data/binance_1h/` (`tc/download_binance.py`). Check: 4h closes match the
+`trend_compass.html` candles (median relative difference 4e-7, the repo's 2-decimal rounding).
+* Bars: 4h, resampled from 1h (origin epoch). Test window 2024-01-01 … 2026-10-01.
+* Features: the stage-29 set, now with its volume features (`vol_z`, `flow_48`, `flow_192`), plus a taker-flow block
+  as in stage 25: taker-buy share of quote volume − 0.5 over 6/24/72 bars, z-score of log trade count (180 bars).
+  Leak test must return 0 again.
+* Training: pooled over all 20 coins. **Evaluation portfolio: the 10 stage-25 evaluation coins** (BTC … TRX),
+  equal weight among those alive. Per-coin counts in the primary endpoint become "≥ 8 of 10".
+* Stage-29 comparators (EQUAL, WEIGHTED-24h) are re-tuned on dev with the stage-29 procedure on this data and run
+  on the same test. This is also a replication of stage 29 on 20 coins with volume, reported as such.
+Everything else in this pre-registration is unchanged.
