@@ -401,9 +401,26 @@ Dev 2022-23 chose hidden 32, training cost 0.3 % in both modes. Test 2024-01 …
 * Largest and most consistent gap of the project in money: POLICY beats every comparator in both modes and at 0.2 %
   cost (long/flat 0.68 vs SuperTrend 0.27), with the smallest drawdown. vs EQUAL +0.33 (p 0.13); vs buy & hold +0.21
   (p 0.11).
-* Where it comes from: per year (long/flat Sharpe) 2024 POLICY 1.85 vs SuperTrend 1.52, 2025 0.06 vs −0.75,
-  2026 0.01 vs 0.03. It mostly lost less in the bad year, holding a smaller average position (0.40). This looks like
-  learned risk timing (the stage-27 lesson that size, not side, is predictable), not better direction.
+* Per year (long/flat Sharpe): 2024 POLICY 1.85 vs SuperTrend 1.52, 2025 0.06 vs −0.75, 2026 0.01 vs 0.03. It mostly
+  lost less in the bad year. Stage 30b below checks where the gain comes from.
 * Continuous long/short positions are tiny (mean |position| small, max DD −7 %, CAGR 3.4 %); the Sharpe is scale-free
   but the money needs leverage. Its discretised copy trades 75 times per coin-year (Sharpe 0.93 at 0.1 %, 0.62 at 0.2 %).
 * Stage-29 replication on 20 coins with volume: WEIGHTED-24h 0.48 vs EQUAL 0.44 (same small positive direction).
+
+## Stage 30b (exploratory: the stage-30 test window was already seen) — where does POLICY's gain come from?
+`tc/stage30b.py`; same window, long/flat, 0.1 %. Re-fitting reproduces POLICY's Sharpe exactly (0.773).
+
+| | CAGR | Sharpe | max DD | avg position |
+|---|---|---|---|---|
+| POLICY | 17.3 % | 0.77 | −29 % | 0.40 |
+| **SuperTrend + vol sizing** (stage-27 recipe) | 15.9 % | **0.82** | −25 % | 0.34 |
+| buy & hold + vol sizing | 20.5 % | 0.71 | −49 % | 0.67 |
+| SuperTrend | 6.1 % | 0.35 | −52 % | 0.49 |
+| POLICY direction (≥ 0.5) × vol sizing | 13.0 % | 0.90 | −17 % | 0.20 |
+* POLICY − (SuperTrend + vol sizing) = −0.05 (p 0.53). **A two-line rule matches the neural policy.** Its gain over
+  plain SuperTrend is the size of the known volatility-sizing gain.
+* POLICY's position follows the trend (corr with SuperTrend-up 0.48, R² 0.23) much more than volatility (corr with
+  the vol-sizing leverage 0.15, R² 0.02). So it did not just learn vol timing; it learned a trend filter that sits
+  out more often, which ends up with a similar risk profile.
+* POLICY direction × vol sizing (0.90) is the best line, but it was chosen after seeing this window. It goes to the
+  forward test (stage 31), not into any claim.

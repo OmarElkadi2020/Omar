@@ -1,0 +1,31 @@
+{
+ "POLICY - SuperTrend + vol sizing": {
+  "sharpe_diff": -0.0496603742078261,
+  "p_one_sided": 0.5283,
+  "ci90": [
+   -0.5717913453287822,
+   0.5023159741700464
+  ]
+ },
+ "POLICY - buy & hold + vol sizing": {
+  "sharpe_diff": 0.06355596632822513,
+  "p_one_sided": 0.4156,
+  "ci90": [
+   -0.30876289852771727,
+   0.40734344472718526
+  ]
+ },
+ "POLICY - SuperTrend": {
+  "sharpe_diff": 0.4281645876993194,
+  "p_one_sided": 0.0921,
+  "ci90": [
+   -0.11163782349566327,
+   0.9776900433027451
+  ]
+ },
+ "R2 position ~ vol leverage only": 0.02153336741056333,
+ "R2 position ~ SuperTrend only": 0.2302280108277429,
+ "R2 position ~ both": 0.24191640729289632,
+ "corr(position, vol leverage)": 0.14674252079940336,
+ "corr(position, SuperTrend up)": 0.47982081116573266
+}
