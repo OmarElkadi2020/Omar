@@ -8,6 +8,7 @@ import re
 import sys
 import time
 import zipfile
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
@@ -29,7 +30,7 @@ WRAPPED = {'WBTC', 'WBETH', 'BETH'}
 def fetch(url, tries=6):
     for k in range(tries):
         try:
-            with urllib.request.urlopen(url, timeout=60) as r:
+            with urllib.request.urlopen(urllib.parse.quote(url, safe=':/?&=%'), timeout=60) as r:
                 return r.read()
         except urllib.error.HTTPError as e:
             if e.code == 404:
