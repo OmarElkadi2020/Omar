@@ -354,3 +354,28 @@ False down-flip = within 30 days the high exceeds the peak of the up-segment tha
 * Cost of a false exit (exit → SuperTrend re-entry, 20 bp): 1h −5.5 %, 4h −11.5 %, 8h −14.6 % (median); gain of a
   true exit: +4 %…+7 % median, +8 %…+13 % mean (fat tail). A veto pays only if P(false) > ≈51 % (4h), 61 % (1h).
 * Verdict: no filter worth pre-registering for 4h/8h; the 1h signal is too weak (the stage-26 study needs AUC ≈ 0.65).
+
+## Stage 29 — profit-weighted training, judged in money (pre-registered; test run once) — **not met**
+Same LightGBM (frozen stage-25 params), B1 label, 4h price-only features, 5 coins (BTC ETH BNB XRP SOL from the
+`trend_compass.html` candles; Binance is not reachable here). EQUAL = no weights; WEIGHTED = each training bar weighted
+by |next 4h return|; WEIGHTED-24h = by |next 24 h return|. Conversion (EWM span, threshold) chosen on dev 2022-23 by
+portfolio Sharpe. Test 2024-01 … 2026-09, yearly refits, long/flat, 0.1 % per side, equal-weight portfolio.
+New money evaluation (`tc/stage29.py`): capture of the hindsight label's P&L, exact regret split (missed moves /
+wrong-side bars / extra costs), money-weighted accuracy, paired block-bootstrap Sharpe test, Newey-West alpha.
+
+| long/flat, 0.1 % | CAGR | Sharpe | max DD | trades/coin-yr | win | capture | money-wt acc |
+|---|---|---|---|---|---|---|---|
+| EQUAL | 25.7 % | 0.80 | −42 % | 12.4 | 38 % | 8.0 % | 0.641 |
+| WEIGHTED | 28.2 % | 0.85 | −43 % | 17.1 | 34 % | 8.3 % | 0.678 |
+| WEIGHTED-24h | 30.7 % | 0.89 | −45 % | 14.3 | 36 % | 9.1 % | 0.664 |
+| SuperTrend(48,5) | 24.6 % | 0.83 | −36 % | 11.8 | 43 % | 7.2 % | 0.675 |
+| buy & hold | 30.1 % | 0.75 | −63 % | — | — | 8.7 % | 0.514 |
+| B1 label (hindsight) | 1179 % | 7.09 | −10 % | 8.6 | 100 % | 100 % | 1 |
+* Primary: WEIGHTED − EQUAL Sharpe +0.05 (90 % CI −0.19 … +0.30, p 0.35); capture higher (yes); better in 3/5 coins
+  (needs 4) → **not met**. WEIGHTED-24h +0.09 (p 0.21). Long/short: +0.09 (p 0.33) and +0.19 (p 0.16).
+* Direction is consistent (both weightings, both modes, 0.2 % cost) and money-weighted accuracy rises 0.641 → 0.678,
+  but no gap is distinguishable from noise, and none of the models differs from SuperTrend (WEIGHTED − ST +0.02,
+  p 0.45) or from buy & hold (alpha t 0.6-0.8 for every strategy).
+* Where the money goes (log-return per year, mean coin): missed moves ≈ 1.0, wrong-side bars ≈ 1.25, costs ≈ 0.01.
+  Every strategy keeps 7-9 % of the hindsight profit; costs are not the problem, direction is.
+* Per year (Sharpe): 2024 all ≈ 1.8-2.1, 2025 all ≈ 0 (−0.24 … +0.23), 2026 0.5-0.8 vs buy & hold 0.02.

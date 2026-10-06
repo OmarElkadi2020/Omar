@@ -117,7 +117,7 @@ def window(idx, lo, hi):
 def portfolio(P, D, lo, hi, cost):
     """P: coin -> position array over full index. Equal weight over coins alive in the window. Daily simple returns."""
     cols = {}
-    for c in COINS:
+    for c in P:
         df = D[c][0]
         w = window(df.index, lo, hi)
         if not w.any():
