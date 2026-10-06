@@ -1,5 +1,5 @@
 """Stage 30: a model trained directly on Sharpe after costs, no label (PREREG_stage30_direct_profit_policy.md).
-python -m tc.stage30 gradcheck|tune|test   (run from research/crypto_trend_classifier)"""
+python -m tc.stage30 gradcheck|leak|tune|test   (run from research/crypto_trend_classifier)"""
 import json
 import sys
 import itertools
@@ -10,8 +10,13 @@ from . import stage29 as s29
 from .labels import oracle_labels
 from .evaluate import supertrend
 
-COINS = s29.COINS
+TRAIN = 'BTC ETH BNB SOL XRP ADA DOGE LINK AVAX TRX DOT LTC BCH ATOM NEAR UNI FIL ETC XLM AAVE'.split()
+EVAL = TRAIN[:10]
+COINS = EVAL
 COST = s29.COST
+T0, T1 = pd.Timestamp('2024-01-01', tz='UTC'), pd.Timestamp('2026-10-01', tz='UTC')
+AGG = dict(open='first', high='max', low='min', close='last', volume='sum', quote_volume='sum', trades='sum',
+           taker_buy_quote='sum')
 GRID = list(itertools.product((8, 32), (1e-4, 1e-3, 1e-2), (0.001, 0.003)))
 SEEDS = (0, 1, 2, 3, 4)
 LR, PATIENCE, MAX_EP, VAL = 0.003, 30, 400, 0.2
@@ -110,17 +115,50 @@ def train_one(Xtr, rtr, ftr, Xva, rva, fva, mode, hidden, l2, c, seed):
 _D = None
 
 
+def bars4h(d1):
+    return d1.resample('4h', origin='epoch').agg(AGG).dropna(subset=['close'])
+
+
+def flow_feats(df):
+    F = {}
+    for n in (6, 24, 72):
+        F[f'tb_{n}'] = df.taker_buy_quote.rolling(n).sum() / df.quote_volume.rolling(n).sum().replace(0, np.nan) - 0.5
+    lt = np.log(df.trades.replace(0, np.nan)).ffill()
+    F['ntr_z'] = (lt - lt.rolling(180, min_periods=50).mean()) / lt.rolling(180, min_periods=50).std()
+    return pd.DataFrame(F, index=df.index).replace([np.inf, -np.inf], np.nan).astype(np.float32)
+
+
+def build(d1):
+    df = bars4h(d1)
+    X = s29.feats(df[['open', 'high', 'low', 'close', 'volume']]).join(flow_feats(df))
+    return df, X
+
+
 def data():
     global _D
     if _D is None:
-        _D = s29.load()
+        _D = {c: build(pd.read_parquet(f'data/binance_1h/{c}.parquet')) for c in TRAIN}
     return _D
+
+
+def leak():
+    bad = 0
+    for c in ('BTC', 'SOL', 'AAVE'):
+        d1 = pd.read_parquet(f'data/binance_1h/{c}.parquet')
+        _, full = build(d1)
+        for cut in pd.date_range('2021-03-01', '2026-06-01', periods=6, tz='UTC'):
+            _, part = build(d1[d1.index < cut])
+            part = part.iloc[:-1]            # the last 4h bar may be incomplete in the truncated 1h data
+            ok = np.isclose(part.values, full.loc[part.index].values, rtol=1e-4, atol=1e-6, equal_nan=True)
+            bad += int((~ok).sum())
+    print('feature leak mismatches:', bad, '| features:', full.shape[1])
+    return bad
 
 
 def train_set(D, cut):
     """rows whose next return closes before the cut-off; standardisation from these rows only."""
     Xs, rs, fs, ts = [], [], [], []
-    for c in COINS:
+    for c in TRAIN:
         df, X = D[c]
         nb = np.r_[df.index[1:], df.index[-1] + s29.STEP]          # open time of the next bar
         w = (nb + s29.STEP) <= cut                                  # next bar closed before the cut-off
@@ -199,7 +237,7 @@ def _dev_job(a):
 
 def tune():
     jobs = [(mode, h, l2, c, Y) for mode in ('lf', 'ls') for (h, l2, c) in GRID for Y in s29.FOLDS]
-    data()
+    D = data()
     with Pool(4) as pool:
         rows = []
         for i, row in enumerate(pool.imap_unordered(_dev_job, jobs)):
@@ -213,9 +251,33 @@ def tune():
     for mode in ('lf', 'ls'):
         g = G[G['mode'] == mode].sort_values('sharpe', ascending=False).iloc[0]
         fz[mode] = dict(hidden=int(g.hidden), l2=float(g.l2), c_train=float(g.c_train), dev_sharpe=float(g.sharpe))
-    json.dump(dict(choice=fz, seeds=list(SEEDS), lr=LR, patience=PATIENCE, max_epochs=MAX_EP, val=VAL),
+    st29 = tune29()
+    for Y in s29.FOLDS:
+        lo, hi = pd.Timestamp(f'{Y}-01-01', tz='UTC'), pd.Timestamp(f'{Y + 1}-01-01', tz='UTC')
+        P = {c: (supertrend(D[c][0], *s29.ST) == 1).astype(int) for c in EVAL}
+        st29[f'ST_dev_sharpe_{Y}'] = s29.sharpe_d(s29.portfolio(P, D, lo, hi, COST)[1])
+    json.dump(dict(choice=fz, st29=st29, seeds=list(SEEDS), lr=LR, patience=PATIENCE, max_epochs=MAX_EP, val=VAL),
               open('prereg/FROZEN_stage30.json', 'w'), indent=1)
     print(json.dumps(fz, indent=1))
+
+
+def tune29():
+    """stage-29 procedure (dev 2022-23, portfolio Sharpe, long/flat) for EQUAL and WEIGHTED-24h on this data."""
+    D = data()
+    fz = {}
+    for kind in ('EQUAL', 'WEIGHTED-24h'):
+        rows = []
+        for Y in s29.FOLDS:
+            lo, hi = pd.Timestamp(f'{Y}-01-01', tz='UTC'), pd.Timestamp(f'{Y + 1}-01-01', tz='UTC')
+            m = s29.fit(D, lo, kind, TRAIN)
+            Pu = {c: m.predict(D[c][1].values.astype(np.float32)) for c in EVAL}
+            for span, th in s29.CONV:
+                P = {c: s29.state(Pu[c], span, th) for c in EVAL}
+                rows.append(dict(span=span, th=th, fold=Y, sharpe=s29.sharpe_d(s29.portfolio(P, D, lo, hi, COST)[1])))
+        g = pd.DataFrame(rows).groupby(['span', 'th']).sharpe.mean().sort_values(ascending=False)
+        fz[kind] = dict(span=int(g.index[0][0]), th=float(g.index[0][1]), dev_sharpe=float(g.iloc[0]))
+        print(kind, fz[kind], flush=True)
+    return fz
 
 
 def _test_job(a):
@@ -229,7 +291,7 @@ def _test_job(a):
 def test():
     D = data()
     fz = json.load(open('prereg/FROZEN_stage30.json'))['choice']
-    f29 = json.load(open('prereg/FROZEN_stage29.json'))['conv']
+    f29 = json.load(open('prereg/FROZEN_stage30.json'))['st29']
     with Pool(4) as pool:
         out = pool.map(_test_job, [(mode, Y, fz[mode]) for mode in ('lf', 'ls') for Y in s29.TEST_YEARS])
     POL = {}
@@ -250,7 +312,7 @@ def test():
         Pu = {c: np.full(len(D[c][0]), np.nan) for c in COINS}
         for Y in s29.TEST_YEARS:
             cut, nxt = pd.Timestamp(f'{Y}-01-01', tz='UTC'), pd.Timestamp(f'{Y + 1}-01-01', tz='UTC')
-            m = s29.fit(D, cut, kind)
+            m = s29.fit(D, cut, kind, TRAIN)
             for c in COINS:
                 idx = D[c][0].index
                 w = (idx >= (cut if Y > s29.TEST_YEARS[0] else idx[0])) & (idx < nxt)
@@ -274,12 +336,12 @@ def test():
         S = strategies(mode)
         for cost in (COST, 2 * COST):
             for name, P in S.items():
-                bar, d = s29.portfolio(P, D, s29.T0, s29.T1, cost)
+                bar, d = s29.portfolio(P, D, T0, T1, cost)
                 daily[(name, mode, cost)] = d
                 VL, TO, Tall = [], [], []
                 for c in COINS:
                     df = D[c][0]
-                    w = s29.window(df.index, s29.T0, s29.T1)
+                    w = s29.window(df.index, T0, T1)
                     cl = df.close.values[w]
                     v = s29.vs_label(P[c][w], s29.positions(LAB[c], mode)[w], cl, cost)
                     VL.append(v)
@@ -287,13 +349,13 @@ def test():
                     pd_ = P[c][w] if name != 'POLICY' else S['POLICY discretised'][c][w]
                     Tall.append(s29.trades(pd_, cl, cost))
                     if cost == COST:
-                        cb, cd = s29.portfolio({c: P[c]}, {c: D[c]}, s29.T0, s29.T1, cost)
+                        cb, cd = s29.portfolio({c: P[c]}, {c: D[c]}, T0, T1, cost)
                         coin_rows.append(dict(strategy=name, mode=mode, coin=c, **s29.money(cb, cd), **v))
                 yrs = len(bar) / s29.BPY
                 rows.append(dict(strategy=name, mode=mode, cost=cost, **s29.money(bar, d),
                                  turnover_y=float(np.mean(TO)), **pd.DataFrame(VL).mean().to_dict(),
                                  **s29.trade_stats(np.concatenate(Tall), yrs * len(COINS)),
-                                 mean_pos=float(np.mean([np.mean(P[c][s29.window(D[c][0].index, s29.T0, s29.T1)]) for c in COINS]))))
+                                 mean_pos=float(np.mean([np.mean(P[c][s29.window(D[c][0].index, T0, T1)]) for c in COINS]))))
                 if cost == COST:
                     for Y in s29.TEST_YEARS:
                         lo, hi = pd.Timestamp(f'{Y}-01-01', tz='UTC'), min(pd.Timestamp(f'{Y + 1}-01-01', tz='UTC'), s29.T1)
@@ -324,7 +386,7 @@ def test():
         n = int((cw['POLICY'] > cw['SuperTrend(48,5)']).sum())
         k = st[f'{mode} cost {COST}: POLICY - SuperTrend(48,5)']
         st[f'PRIMARY {mode}'] = dict(sharpe_diff=k['sharpe_diff'], p=k['p_one_sided'], coins_better=n,
-                                     met=bool(k['sharpe_diff'] > 0 and k['p_one_sided'] < 0.025 and n >= 4))
+                                     met=bool(k['sharpe_diff'] > 0 and k['p_one_sided'] < 0.025 and n >= 8))
     st['PRIMARY met (either mode)'] = st['PRIMARY lf']['met'] or st['PRIMARY ls']['met']
     json.dump(st, open('results_stage30_stats.json', 'w'), indent=1)
     pd.set_option('display.width', 250); pd.set_option('display.max_columns', 40)
@@ -334,4 +396,4 @@ def test():
 
 
 if __name__ == '__main__':
-    {'gradcheck': gradcheck, 'tune': tune, 'test': test}[sys.argv[1]]()
+    {'gradcheck': gradcheck, 'leak': leak, 'tune': tune, 'test': test}[sys.argv[1]]()

@@ -79,9 +79,9 @@ def train_rows(df, X, cut):
     return X.values[m][:keep].astype(np.float32), (lab[:keep] == 1).astype(int), w1, w24
 
 
-def fit(D, cut, kind):
+def fit(D, cut, kind, coins=COINS):
     Xs, ys, ws = [], [], []
-    for c in COINS:
+    for c in coins:
         df, X = D[c]
         x, y, w1, w24 = train_rows(df, X, cut)
         Xs.append(x); ys.append(y); ws.append(w1 if kind == 'WEIGHTED' else w24)
@@ -90,7 +90,7 @@ def fit(D, cut, kind):
     p = dict(objective='binary', learning_rate=P25['lr'], num_leaves=P25['leaves'], min_data_in_leaf=P25['min_leaf'],
              feature_fraction=P25['ff'], bagging_fraction=P25['bf'], bagging_freq=1, lambda_l2=P25['l2'],
              verbose=-1, num_threads=4, seed=0, deterministic=True)
-    cols = list(D[COINS[0]][1].columns)
+    cols = list(D[coins[0]][1].columns)
     return lgb.train(p, lgb.Dataset(X, y, weight=w, feature_name=cols), num_boost_round=P25['trees'])
 
 
