@@ -379,3 +379,31 @@ wrong-side bars / extra costs), money-weighted accuracy, paired block-bootstrap 
 * Where the money goes (log-return per year, mean coin): missed moves ≈ 1.0, wrong-side bars ≈ 1.25, costs ≈ 0.01.
   Every strategy keeps 7-9 % of the hindsight profit; costs are not the problem, direction is.
 * Per year (Sharpe): 2024 all ≈ 1.8-2.1, 2025 all ≈ 0 (−0.24 … +0.23), 2026 0.5-0.8 vs buy & hold 0.02.
+
+## Stage 30 — a model trained directly on Sharpe after costs, no label (pre-registered; test run once) — **not met**
+Amendment 1 (before any result): Binance spot 1h klines with volume and taker flow for 20 coins, committed in
+`data/binance_1h/` (`tc/download_binance.py`); 4h bars; 135 price/volume/flow features (leak test 0); training pooled
+on 20 coins, evaluation portfolio = 10 coins (BTC ETH BNB SOL XRP ADA DOGE LINK AVAX TRX).
+POLICY = numpy MLP whose output is the position (sigmoid for long/flat, tanh for long/short), trained on −Sharpe of
+its own P&L after a training cost, 5-seed ensemble, early stopping (`tc/stage30.py`, exact gradient checked).
+Dev 2022-23 chose hidden 32, training cost 0.3 % in both modes. Test 2024-01 … 2026-09, 0.1 % per side.
+
+| long/flat | CAGR | Sharpe | max DD | avg position | alpha vs B&H (t) |
+|---|---|---|---|---|---|
+| POLICY | 17.3 % | **0.77** | **−29 %** | 0.40 | 5.8 %/yr (1.34) |
+| EQUAL classifier (st. 29 recipe) | 9.8 % | 0.44 | −57 % | 0.52 | 0.7 % (0.05) |
+| WEIGHTED-24h classifier | 11.7 % | 0.48 | −55 % | 0.53 | — |
+| SuperTrend(48,5) | 6.1 % | 0.35 | −52 % | 0.49 | −2.2 % (−0.15) |
+| buy & hold | 16.8 % | 0.56 | −66 % | 1 | — |
+
+* Primary: long/flat POLICY − SuperTrend Sharpe **+0.43** (90 % CI −0.11 … +0.98, p 0.092), better in 8/10 coins;
+  long/short **+0.92** (CI −0.21 … +2.03, p 0.091), 8/10. The pre-registered bar is p < 0.025 → **not met** in either.
+* Largest and most consistent gap of the project in money: POLICY beats every comparator in both modes and at 0.2 %
+  cost (long/flat 0.68 vs SuperTrend 0.27), with the smallest drawdown. vs EQUAL +0.33 (p 0.13); vs buy & hold +0.21
+  (p 0.11).
+* Where it comes from: per year (long/flat Sharpe) 2024 POLICY 1.85 vs SuperTrend 1.52, 2025 0.06 vs −0.75,
+  2026 0.01 vs 0.03. It mostly lost less in the bad year, holding a smaller average position (0.40). This looks like
+  learned risk timing (the stage-27 lesson that size, not side, is predictable), not better direction.
+* Continuous long/short positions are tiny (mean |position| small, max DD −7 %, CAGR 3.4 %); the Sharpe is scale-free
+  but the money needs leverage. Its discretised copy trades 75 times per coin-year (Sharpe 0.93 at 0.1 %, 0.62 at 0.2 %).
+* Stage-29 replication on 20 coins with volume: WEIGHTED-24h 0.48 vs EQUAL 0.44 (same small positive direction).
