@@ -424,3 +424,21 @@ Dev 2022-23 chose hidden 32, training cost 0.3 % in both modes. Test 2024-01 …
   out more often, which ends up with a similar risk profile.
 * POLICY direction × vol sizing (0.90) is the best line, but it was chosen after seeing this window. It goes to the
   forward test (stage 31), not into any claim.
+
+## Stage 32 — liquidations and positioning as overlays on SuperTrend + vol sizing (pre-registered; test once) — **not met**
+Coinalyze daily data for the 10 Binance perps (`data/coinalyze/`, `tc/download_coinalyze.py`): liquidations and open
+interest from 2022-08, funding from 2020. Daily values used from the next day. Base A = SuperTrend(48,5) 4h × vol
+sizing. H1 flush-buy: after long liquidations / OI exceed their 90-day mean by z σ, hold long (vol-sized) for K days
+even if SuperTrend is down. H2 crowded exit: when funding is above its trailing-year q-quantile, scale A by s.
+Dev chose H1 z 3, K 14 (dev Sharpe 2.30 vs A 1.89, every grid point above A) and H2 q 0.90, s 0.5 (every grid
+point below A). Test 2024-01 … 2026-09, 0.1 %:
+
+| | CAGR | Sharpe | max DD | avg position |
+|---|---|---|---|---|
+| A: SuperTrend + vol sizing | 15.9 % | **0.82** | **−25 %** | 0.34 |
+| A + H1 flush-buy | 17.7 % | 0.79 | −36 % | 0.44 |
+| A + H2 crowded exit | 14.1 % | 0.79 | −25 % | 0.33 |
+* H1 − A −0.04 (p 0.49), 5/10 coins; H2 − A −0.04 (p 0.70), 6/10 → **neither met**. H2 on plain SuperTrend −0.04.
+* H1's dev gain did not carry over: it helped in 2024 (2.37 vs 1.96) and hurt in 2025-26 (−0.03 / −0.14 vs
+  −0.27 / 0.75), with a deeper drawdown. Buying after liquidation flushes adds risk, not risk-adjusted return.
+* Flushes ≈ 25 days per coin in 2.7 years, crowded funding ≈ 52 days.

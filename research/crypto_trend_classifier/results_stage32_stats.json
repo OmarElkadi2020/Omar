@@ -1,0 +1,32 @@
+{
+ "H1": {
+  "sharpe_diff": -0.0353085383984596,
+  "p_one_sided": 0.4877,
+  "ci90": [
+   -0.5328838646264006,
+   0.42685771220115015
+  ],
+  "coins_better": 5,
+  "met": false
+ },
+ "H2": {
+  "sharpe_diff": -0.03685218748249064,
+  "p_one_sided": 0.6989,
+  "ci90": [
+   -0.14680955323632136,
+   0.07254742176355819
+  ],
+  "coins_better": 6,
+  "met": false
+ },
+ "secondary: SuperTrend + H2 - SuperTrend": {
+  "sharpe_diff": -0.03909010932546708,
+  "p_one_sided": 0.7147,
+  "ci90": [
+   -0.14520423046141603,
+   0.06911286755113755
+  ]
+ },
+ "flush days per coin (test, mean)": 25.2,
+ "crowded days per coin (test, mean)": 52.3
+}
