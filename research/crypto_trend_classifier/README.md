@@ -442,3 +442,13 @@ point below A). Test 2024-01 … 2026-09, 0.1 %:
 * H1's dev gain did not carry over: it helped in 2024 (2.37 vs 1.96) and hurt in 2025-26 (−0.03 / −0.14 vs
   −0.27 / 0.75), with a deeper drawdown. Buying after liquidation flushes adds risk, not risk-adjusted return.
 * Flushes ≈ 25 days per coin in 2.7 years, crowded funding ≈ 52 days.
+
+### Stage 32b (exploratory, same data) — what do liquidation spikes tell us?
+Spike = liquidations / OI above the 90-day mean by 3 σ (daily, 10 coins, 2022-12 … 2026-09). Excess return vs the
+coin's normal h-day return, averaged per event day and thinned to non-overlapping days (clustered t):
+* Long-liquidation spike (day itself −5.1 %): next 3 days **+1.3 %** (t 1.65, 91 event days); 14 days +0.35 % (t 0.16).
+  A small, short bounce that is gone within two weeks; the stage-32 rule held 14 days.
+* Short-liquidation spike (day itself +4.9 %): 3 days +1.1 % (t 1.6); 14 days +2.1 % (t 1.05). Weak continuation.
+* Volatility: next-7-day vol / prior-30-day vol median 1.04 after spikes vs 0.86 otherwise (9/10 coins for long
+  spikes). **The robust message is "more volatility ahead", not a direction.**
+None of this is significant; a 3-day bounce rule would need its own pre-registration and fresh data.
