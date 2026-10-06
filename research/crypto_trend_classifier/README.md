@@ -452,3 +452,19 @@ coin's normal h-day return, averaged per event day and thinned to non-overlappin
 * Volatility: next-7-day vol / prior-30-day vol median 1.04 after spikes vs 0.86 otherwise (9/10 coins for long
   spikes). **The robust message is "more volatility ahead", not a direction.**
 None of this is significant; a 3-day bounce rule would need its own pre-registration and fresh data.
+
+## Stage 16 implementability check (exploratory, 2026-10, rebuilt on data/universe_4h)
+Rebuild reproduces the published test (long-short α 89 %/yr, t 5.7 vs 82 %, t 5.3). But in money (2022-01 … 2026-10):
+
+| | cost 0.1 %/side | | | cost 0.3 %/side | |
+|---|---|---|---|---|---|
+| | CAGR | Sharpe | max DD | Sharpe | max DD |
+| long-only top 20 % | −15 % | 0.2 | −82 % | −0.1 | −89 % |
+| long top 20 % + BTC-perp short (60-day beta hedge, real BTC funding) | <0 | 0.0 | −76 % | −0.5 | −89 % |
+| long-short (every bottom coin shorted) | +154 % | 2.5 | −38 % | 1.4 | −53 % |
+* The long-only book beats the alt market every year (α t 4.5) but loses money in absolute terms: 2022 −62 %,
+  2025 −61 %. Hedging with BTC does not rescue it: the alts it picks still lag BTC.
+* **All the money is in shorting the weakest alts.** Today 18 of the bottom 20 have a Binance USDT-M perp, but
+  earlier years had fewer, and small-cap shorts carry funding spikes, squeezes, slippage and position limits.
+  At 0.3 % per side the long-short Sharpe already drops to 1.4 (2023 −9 %, 2024 +3 %). Treat the stage-16 alpha as
+  unproven in practice until it is paper-traded with real perp fills.
