@@ -1,6 +1,7 @@
 """Stage 30: a model trained directly on Sharpe after costs, no label (PREREG_stage30_direct_profit_policy.md).
 python -m tc.stage30 gradcheck|leak|tune|test   (run from research/crypto_trend_classifier)"""
 import json
+import os
 import sys
 import itertools
 from multiprocessing import Pool
@@ -238,11 +239,16 @@ def _dev_job(a):
 def tune():
     jobs = [(mode, h, l2, c, Y) for mode in ('lf', 'ls') for (h, l2, c) in GRID for Y in s29.FOLDS]
     D = data()
+    LOG = 'results_stage30_dev.jsonl'          # one line per finished job, so a restart resumes
+    rows = [json.loads(x) for x in open(LOG)] if os.path.exists(LOG) else []
+    done = {(r['mode'], r['hidden'], r['l2'], r['c_train'], r['fold']) for r in rows}
+    todo = [j for j in jobs if j not in done]
     with Pool(4) as pool:
-        rows = []
-        for i, row in enumerate(pool.imap_unordered(_dev_job, jobs)):
+        for row in pool.imap_unordered(_dev_job, todo):
             rows.append(row)
-            print(i + 1, '/', len(jobs), row['mode'], row['hidden'], row['l2'], row['c_train'], row['fold'],
+            with open(LOG, 'a') as fh:
+                fh.write(json.dumps(row) + '\n')
+            print(len(rows), '/', len(jobs), row['mode'], row['hidden'], row['l2'], row['c_train'], row['fold'],
                   round(row['sharpe'], 3), flush=True)
     R = pd.DataFrame(rows)
     R.to_csv('results_stage30_dev.csv', index=False)
