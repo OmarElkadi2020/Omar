@@ -52,6 +52,7 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
 | Long-term cycle, weekly swings, long MAs, ETF flows | `python -m tc.longterm_state` | `MARKET_LONGTERM_<date>.md` |
 | Macro context (FRED net liquidity, rates, CMC dominance) | `python -m tc.market_context` | `results_market_context.json` |
 | Cross-sectional coin ranking (stage 16 rebuilt) | `python -m tc.live16 check` / `rank` | `results_live16_*.csv` |
+| Hourly risk watch: alert levels 0 OK / 1 WARNING / 2 DANGER / 3 EXIT (rules in the docstring) | `python -m tc.watch` | `data/watch_log.jsonl` (gitignored) |
 | Forward test of frozen rules (stage 31) | `python -m tc.stage31 update` then `run` | `results_stage31_forward.*` |
 
 ## Conventions (keep them)
