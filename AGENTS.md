@@ -53,7 +53,8 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
 | Macro context (FRED net liquidity, rates, CMC dominance) | `python -m tc.market_context` | `analysis/medium_term/macro/<date>_market_context.json` (written by the script) |
 | Cross-sectional coin ranking (stage 16 rebuilt) | `python -m tc.live16 check` / `rank` | `results_live16_*.csv` |
 | Hourly risk watch: alert levels 0 OK / 1 WARNING / 2 DANGER / 3 EXIT (rules in the docstring) | `python -m tc.watch` | `data/watch_log.jsonl` (gitignored) |
-| Portfolio risk: per-coin trend lines, vol, beta, drawdown, stress to BTC daily line, alts-vs-BTC base rates | `python -m tc.portfolio <holdings.json>` (`{"COIN": {"qty", "cost"}}`; keep personal holdings out of git unless the user asks) | `<holdings>_snapshot.json` |
+| Portfolio risk: per-coin trend lines, vol, beta, drawdown, stress to BTC daily line, alts-vs-BTC base rates | `python -m tc.portfolio <holdings.json>` (`{"COIN": {"qty", "cost"}}`; holdings live in `analysis/portfolio/`) | `<holdings>_snapshot.json` |
+| Backtest of the account as of 2025-11-01 vs hold / trend-exit / BTC / BTC-ETH alternatives | `python -m tc.portfolio_backtest` | `analysis/portfolio/<date>_portfolio_review.md` |
 | Forward test of frozen rules (stage 31) | `python -m tc.stage31 update` then `run` | `results_stage31_forward.*` |
 
 ## Where market analyses go (`research/crypto_trend_classifier/analysis/`)
@@ -62,6 +63,7 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
   liquidations, L/S, aggressor flow, ETF flows), and one folder per coin named by ticker (`LINK/`, `BTC/`, …).
 - Every folder has `README.md` (what belongs there) and `INDEX.md` (table of files). When you add an analysis, add a
   row to the folder's `INDEX.md`, the horizon's `INDEX.md` and `analysis/INDEX.md`. File name: `YYYY-MM-DD_<topic>.md`.
+- The user's real portfolio reviews, holdings JSON and plans go under `portfolio/` (numbers only: never statements, names, emails or account IDs).
 - Short events (hours/days, e.g. intraday anatomy) go under `short_term/`. Research stages stay outside `analysis/`.
 
 ## Conventions (keep them)
