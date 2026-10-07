@@ -53,6 +53,7 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
 | Macro context (FRED net liquidity, rates, CMC dominance) | `python -m tc.market_context` | `analysis/medium_term/macro/<date>_market_context.json` (written by the script) |
 | Cross-sectional coin ranking (stage 16 rebuilt) | `python -m tc.live16 check` / `rank` | `results_live16_*.csv` |
 | Hourly risk watch: alert levels 0 OK / 1 WARNING / 2 DANGER / 3 EXIT (rules in the docstring) | `python -m tc.watch` | `data/watch_log.jsonl` (gitignored) |
+| Portfolio risk: per-coin trend lines, vol, beta, drawdown, stress to BTC daily line, alts-vs-BTC base rates | `python -m tc.portfolio <holdings.json>` (`{"COIN": {"qty", "cost"}}`; keep personal holdings out of git unless the user asks) | `<holdings>_snapshot.json` |
 | Forward test of frozen rules (stage 31) | `python -m tc.stage31 update` then `run` | `results_stage31_forward.*` |
 
 ## Where market analyses go (`research/crypto_trend_classifier/analysis/`)
