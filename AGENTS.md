@@ -48,7 +48,7 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
 | question | command | report |
 |---|---|---|
 | Market state: trend on 4h/8h/12h/1D, breadth, waves, pullbacks, positioning, L/S study | `python -m tc.market_state` | `analysis/medium_term/macro/<date>_market_state.md` + `analysis/medium_term/positioning_flows/<date>_positioning_long_short.md` |
-| Hour-by-hour anatomy of a sharp move (aggressor side, OI, liquidations, hour-of-day liquidity) | `python -m tc.intraday_snapshot <date> 40` | `analysis/medium_term/positioning_flows/<date>_<event>.md` |
+| Hour-by-hour anatomy of a sharp move (aggressor side, OI, liquidations, hour-of-day liquidity) | `python -m tc.intraday_snapshot <date> 40` | `analysis/short_term/positioning_flows/<date>_<event>.md` |
 | Long-term cycle, weekly swings, long MAs, ETF flows | `python -m tc.longterm_state` | `analysis/long_term/macro/<date>_cycle_and_structure.md` + `analysis/long_term/positioning_flows/<date>_etf_flows.md` |
 | Macro context (FRED net liquidity, rates, CMC dominance) | `python -m tc.market_context` | `analysis/medium_term/macro/<date>_market_context.json` (written by the script) |
 | Cross-sectional coin ranking (stage 16 rebuilt) | `python -m tc.live16 check` / `rank` | `results_live16_*.csv` |
@@ -56,12 +56,12 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
 | Forward test of frozen rules (stage 31) | `python -m tc.stage31 update` then `run` | `results_stage31_forward.*` |
 
 ## Where market analyses go (`research/crypto_trend_classifier/analysis/`)
-- `long_term/` (6 months to 1 year) and `medium_term/` (2 weeks to 6 months).
+- `short_term/` (hours to 2 weeks), `medium_term/` (2 weeks to 6 months) and `long_term/` (6 months to 1 year).
 - Inside each: `macro/` (whole market: trend, breadth, cycle, macro context), `positioning_flows/` (OI, funding,
   liquidations, L/S, aggressor flow, ETF flows), and one folder per coin named by ticker (`LINK/`, `BTC/`, …).
 - Every folder has `README.md` (what belongs there) and `INDEX.md` (table of files). When you add an analysis, add a
   row to the folder's `INDEX.md`, the horizon's `INDEX.md` and `analysis/INDEX.md`. File name: `YYYY-MM-DD_<topic>.md`.
-- Short events (hours/days) go under `medium_term/` with the wave they belong to. Research stages stay outside `analysis/`.
+- Short events (hours/days, e.g. intraday anatomy) go under `short_term/`. Research stages stay outside `analysis/`.
 
 ## Conventions (keep them)
 - Timestamps are UTC, and candles are indexed by **open** time. A daily value of day d is only usable from d+1.
