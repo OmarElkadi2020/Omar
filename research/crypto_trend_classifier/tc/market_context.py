@@ -1,5 +1,6 @@
 """Market context for the live assessment (information only; stages 25, 26, 32 found no money in these signals).
-Needs FRED_API_KEY, COIN_MARKET_CAP_API_KEY.  python -m tc.market_context"""
+Needs FRED_API_KEY, COIN_MARKET_CAP_API_KEY.  python -m tc.market_context
+Writes analysis/medium_term/macro/<date>_market_context.json."""
 import json
 import os
 import urllib.request
@@ -38,7 +39,8 @@ def main():
         stablecoin_mcap_bn=round(q.get('stablecoin_market_cap', float('nan')) / 1e9, 1),
         stablecoin_24h_pct=round(q.get('stablecoin_24h_percentage_change', float('nan')), 2),
         cmc_last_updated=g.get('last_updated'))
-    json.dump(out, open('results_market_context.json', 'w'), indent=1, default=float)
+    f = f"analysis/medium_term/macro/{pd.Timestamp.utcnow():%Y-%m-%d}_market_context.json"
+    json.dump(out, open(f, 'w'), indent=1, default=float)
     print(json.dumps(out, indent=1, default=float))
 
 

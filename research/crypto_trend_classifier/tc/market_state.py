@@ -1,4 +1,5 @@
-"""Market-state snapshot (descriptive, not a forecast). Reproduces MARKET_STATE_2026-10-06.md from repo data.
+"""Market-state snapshot (descriptive, not a forecast). Reproduces analysis/medium_term/macro/2026-10-06_market_state.md
+and analysis/medium_term/positioning_flows/2026-10-06_positioning_long_short.md from repo data.
 Inputs: data/universe_4h, data/binance_1h, data/coinalyze (+ COINALYZE_API_KEY for the long/short-ratio history).
 python -m tc.market_state"""
 import json

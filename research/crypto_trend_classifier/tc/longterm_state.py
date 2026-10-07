@@ -1,6 +1,7 @@
 """Long-term BTC picture (descriptive): halving-cycle comparison, weekly swing structure since the Oct-2025 peak,
 long moving averages, weekly SuperTrend, and US spot-ETF flows (data/bykaranteli, see tc/download_bykaranteli.py).
-Reproduces MARKET_LONGTERM_2026-10-07.md.   python -m tc.longterm_state"""
+Reproduces analysis/long_term/macro/2026-10-07_cycle_and_structure.md and
+analysis/long_term/positioning_flows/2026-10-07_etf_flows.md.   python -m tc.longterm_state"""
 import numpy as np
 import pandas as pd
 from .evaluate import supertrend
