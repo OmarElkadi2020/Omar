@@ -69,6 +69,7 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
 - Short events (hours/days, e.g. intraday anatomy) go under `short_term/`. Research stages stay outside `analysis/`.
 
 ## Conventions (keep them)
+- The user reads times in **Berlin time** (Europe/Berlin: UTC+2 until 2026-10-25, then UTC+1). Data stays in UTC; give Berlin time in messages and reports.
 - Timestamps are UTC, and candles are indexed by **open** time. A daily value of day d is only usable from d+1.
 - New hypotheses: write `prereg/PREREG_stageNN_*.md` and commit it **before** any result. Tune on dev, freeze
   in `prereg/FROZEN_stageNN.json`, run the test once, and document both what worked and what did not in
