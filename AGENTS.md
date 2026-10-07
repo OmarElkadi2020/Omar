@@ -56,6 +56,7 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
 | Macro / flows watch: DXY (rebuilt from FX), Treasury curve, Brent, gold, S&P, Fed balance sheet, net liquidity, BTC/ETH ETF flows, F&G | `python -m tc.macro_watch` | `data/macro_log.jsonl` (gitignored) |
 | Positioning / flow watch (Binance perps BTC ETH LINK XRP; 1h/4h/24h): price x OI reading, taker flow, liquidations, funding, L/S | `python -m tc.positioning_watch` | `data/positioning_log.jsonl` (gitignored) |
 | Portfolio risk: per-coin trend lines, vol, beta, drawdown, stress to BTC daily line, alts-vs-BTC base rates | `python -m tc.portfolio <holdings.json>` (`{"COIN": {"qty", "cost"}}`; holdings live in `analysis/portfolio/`) | `<holdings>_snapshot.json` |
+| Portfolio plan watch: per held coin 12h ST(20,4) and daily ST(48,6) state/flips on closed candles, BTC daily line and weekly close vs 98k, book value 36k/40k/44k | `python -m tc.plan_watch [holdings.json]` | `data/plan_log.jsonl` (gitignored); plan in `analysis/portfolio/2026-10-07_plan_v2.md` |
 | Backtest of the account as of 2025-11-01 vs hold / trend-exit / BTC / BTC-ETH alternatives | `python -m tc.portfolio_backtest` | `analysis/portfolio/<date>_portfolio_review.md` |
 | Forward test of frozen rules (stage 31) | `python -m tc.stage31 update` then `run` | `results_stage31_forward.*` |
 
