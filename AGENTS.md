@@ -15,7 +15,7 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
   | `BYkaranteli_API_KEY` | bykaranteli.com (header `x-api-key` or `Authorization: Bearer`) | US spot ETF flows, per-issuer ETF data, cross-venue liquidations, DVOL |
   | `COIN_MARKET_CAP_API_KEY` | pro-api.coinmarketcap.com (header `X-CMC_PRO_API_KEY`) | global metrics (BTC dominance, total cap), Fear & Greed (`/v3/fear-and-greed/latest`, `/historical`) |
   | `FRED_API_KEY` | api.stlouisfed.org (query `api_key`) | US net liquidity (WALCL − WTREGEN − RRPONTSYD), DFEDTARU, DGS10 |
-  | `FMP_API_KEY` | financialmodelingprep.com | reachable, but ETF endpoints need a paid plan (HTTP 402) |
+  | `FMP_API_KEY` | financialmodelingprep.com (query `apikey`) | `/stable/quote` for FX majors (not SEK), BZUSD, GCUSD, ^GSPC; `/stable/treasury-rates`. DXY, ^TNX and ETF endpoints need a paid plan |
   | `SEC_API_IO_KEY`, `cryptohftdata_API_KEY` | not used yet | — |
 
 ## What is reachable from the cloud container (checked 2026-10)
@@ -53,6 +53,7 @@ All research code lives in `research/crypto_trend_classifier/`. **Run every comm
 | Macro context (FRED net liquidity, rates, CMC dominance) | `python -m tc.market_context` | `analysis/medium_term/macro/<date>_market_context.json` (written by the script) |
 | Cross-sectional coin ranking (stage 16 rebuilt) | `python -m tc.live16 check` / `rank` | `results_live16_*.csv` |
 | Hourly risk watch: alert levels 0 OK / 1 WARNING / 2 DANGER / 3 EXIT (rules in the docstring) | `python -m tc.watch` | `data/watch_log.jsonl` (gitignored) |
+| Macro / flows watch: DXY (rebuilt from FX), Treasury curve, Brent, gold, S&P, Fed balance sheet, net liquidity, BTC/ETH ETF flows, F&G | `python -m tc.macro_watch` | `data/macro_log.jsonl` (gitignored) |
 | Portfolio risk: per-coin trend lines, vol, beta, drawdown, stress to BTC daily line, alts-vs-BTC base rates | `python -m tc.portfolio <holdings.json>` (`{"COIN": {"qty", "cost"}}`; holdings live in `analysis/portfolio/`) | `<holdings>_snapshot.json` |
 | Backtest of the account as of 2025-11-01 vs hold / trend-exit / BTC / BTC-ETH alternatives | `python -m tc.portfolio_backtest` | `analysis/portfolio/<date>_portfolio_review.md` |
 | Forward test of frozen rules (stage 31) | `python -m tc.stage31 update` then `run` | `results_stage31_forward.*` |
