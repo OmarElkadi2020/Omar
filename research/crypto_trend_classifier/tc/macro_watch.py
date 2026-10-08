@@ -82,7 +82,7 @@ def fear_greed():
 
 
 def main():
-    out = dict(time=str(pd.Timestamp.utcnow().floor('min')))
+    out = dict(time_berlin=pd.Timestamp.utcnow().tz_convert('Europe/Berlin').strftime('%Y-%m-%d %H:%M %Z'), time=str(pd.Timestamp.utcnow().floor('min')))
     for k, f in dict(markets=quotes, treasuries=treasuries, liquidity=liquidity, etf=etf, fear_greed=fear_greed).items():
         try:
             out[k] = f()

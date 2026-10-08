@@ -39,7 +39,7 @@ def main():
     if os.path.exists(LOG):
         lines = [x for x in open(LOG) if x.strip()]
         prev = json.loads(lines[-1]) if lines else None
-    out = dict(time=str(now.floor('min')), coins={}, alerts=[])
+    out = dict(time_berlin=now.tz_convert('Europe/Berlin').strftime('%Y-%m-%d %H:%M %Z'), time=str(now.floor('min')), coins={}, alerts=[])
     value = 0.0
     for c, (d, px) in data.items():
         d = d[list(AGG)]

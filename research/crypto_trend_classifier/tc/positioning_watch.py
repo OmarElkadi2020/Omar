@@ -56,7 +56,8 @@ def window(d, n):
 
 def main():
     D = fetch()
-    out = dict(time=str(pd.Timestamp.utcnow().floor('min')), last_hour=str(D['BTC'].index[-1]))
+    out = dict(time_berlin=pd.Timestamp.utcnow().tz_convert('Europe/Berlin').strftime('%Y-%m-%d %H:%M %Z'), time=str(pd.Timestamp.utcnow().floor('min')),
+               last_hour=str(D['BTC'].index[-1]), last_hour_berlin=D['BTC'].index[-1].tz_convert('Europe/Berlin').strftime('%H:%M'))
     for c, d in D.items():
         out[c] = dict(price=float(d.ohlcv_c.iloc[-1]), oi_coins=float(d.open_c.iloc[-1]),
                       funding_pct=round(float(d.funding_c.dropna().iloc[-1]), 4),

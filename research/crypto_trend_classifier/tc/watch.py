@@ -110,7 +110,7 @@ def main():
         level, name = 1, 'WARNING'
     else:
         level, name = 0, 'OK'
-    out = dict(time=str(pd.Timestamp.utcnow().floor('min')), level=level, status=name, trend=T, long_liq_6h_m=liq6,
+    out = dict(time_berlin=pd.Timestamp.utcnow().tz_convert('Europe/Berlin').strftime('%Y-%m-%d %H:%M %Z'), time=str(pd.Timestamp.utcnow().floor('min')), level=level, status=name, trend=T, long_liq_6h_m=liq6,
                stable=st, etf_btc=et, conditions=extras, previous_level=prev.get('level') if prev else None)
     with open(LOG, 'a') as fh:
         fh.write(json.dumps(out, default=str) + '\n')
