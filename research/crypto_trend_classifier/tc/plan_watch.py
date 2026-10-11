@@ -1,12 +1,14 @@
 """Portfolio plan watch (descriptive, not advice). Checks the user's plan levels on COMPLETED candles only and prints
 one JSON line, appended to data/plan_log.jsonl (gitignored). Needs COINALYZE_API_KEY (latest candles).
-Plan (analysis/portfolio/2026-10-07_plan_v2.md):
+Plan (analysis/portfolio/2026-10-11_plan_v3.md):
   per held coin  12h SuperTrend(20,4) close below the line -> stage A (sell half of that coin)
                  12h close back above the line             -> stage A undone (half may be bought back)
                  daily SuperTrend(48,6) close below         -> stage B (sell the rest of that coin)
   BTC            daily close below its daily line           -> cut remaining alts by half
                  weekly close (Monday-open weeks) > 98,000  -> long-term higher high; plan re-entry rules
   book value     36k (keep 3k cash aside) / 40k (sell a third) / 44k (sell another third)
+  EXEMPT coins   (ETH, owner's decision 2026-10-11) get no stage A/B: their flips are reported as info only;
+                 they are still halved by the BTC daily rule.
 Lines trail the price, so they are recomputed each run; a 'flip' is a state change vs the previous log line.
 python -m tc.plan_watch [holdings.json]"""
 import json
@@ -21,6 +23,7 @@ HOLD = 'analysis/portfolio/2026-10-07_holdings.json'
 AGG = dict(open='first', high='max', low='min', close='last')
 TF = {'12h': (20, 4.0), '1D': (48, 6.0)}
 BOOK_LEVELS = (36000, 40000, 44000)
+EXEMPT = {'ETH'}
 
 
 def closed(d, rule, now):
@@ -53,8 +56,9 @@ def main():
             if was and was != row[tf]['state']:
                 stage = {'12h': 'A', '1D': 'B'}[tf]
                 verb = 'below' if s == -1 else 'back above'
-                out['alerts'].append(f'{c} {tf} closed {verb} its line ({l:.6g}) -> stage {stage}'
-                                     + (' undone' if s == 1 else ''))
+                out['alerts'].append(f'{c} {tf} closed {verb} its line ({l:.6g}) -> '
+                                     + ('info only (exempt from stage A/B)' if c in EXEMPT else
+                                        f'stage {stage}' + (' undone' if s == 1 else '')))
         if c in H:
             row['value'] = H[c]['qty'] * px
             value += row['value']
@@ -71,7 +75,7 @@ def main():
     for v in set(hit) - set(prev_hit):
         out['alerts'].append(f'portfolio value reached {v:,}')
     out['nearest'] = sorted(((c, tf, r[tf]['dist_pct']) for c, r in out['coins'].items() for tf in TF
-                             if r[tf]['state'] == 'UP'), key=lambda t: -t[2])[:4]
+                             if r[tf]['state'] == 'UP' and c not in EXEMPT), key=lambda t: -t[2])[:4]
     with open(LOG, 'a') as fh:
         fh.write(json.dumps(out, default=str) + '\n')
     print(json.dumps(out, default=str, ensure_ascii=False, indent=1))
