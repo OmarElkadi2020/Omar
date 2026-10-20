@@ -4,6 +4,9 @@ For BTC, ETH, LINK, XRP and windows of 1h, 4h, 24h (completed hours only): price
 the latest funding rate and long/short account ratio, and the usual reading of price x OI:
 price up + OI up = new longs, price up + OI down = short covering, price down + OI up = new shorts,
 price down + OI down = longs closing / liquidated. The reading is a convention, not proof of who traded.
+Crowding flag on the 72h window: price < -2% with OI (coins) > +3% = shorts piling up; price > +2% with OI > +3% =
+longs piling up. On BTC daily data 2022-08 -> 2026-10 (~80 cases) the shorts case raised the odds of a big move
+in either direction (next day > +2%: 22% vs 16%; 3 days < -3%: 21% vs 16%), not the direction. A heads-up only.
 Prints one JSON line and appends it to data/positioning_log.jsonl (gitignored).
 python -m tc.positioning_watch"""
 import json
@@ -16,7 +19,7 @@ COINS = ('BTC', 'ETH', 'LINK', 'XRP')
 LOG = 'data/positioning_log.jsonl'
 
 
-def fetch(days=3):
+def fetch(days=4):
     now = int(time.time())
     fr = now - days * 86400
     syms = ','.join(f'{c}USDT_PERP.A' for c in COINS)
@@ -54,6 +57,14 @@ def window(d, n):
                 liq_long_usd_m=round(w.liquidation_l.sum() / 1e6, 1), liq_short_usd_m=round(w.liquidation_s.sum() / 1e6, 1))
 
 
+def crowding(w):
+    if w['oi_pct'] > 3 and w['price_pct'] < -2:
+        return 'shorts piling up (big move more likely, direction unknown)'
+    if w['oi_pct'] > 3 and w['price_pct'] > 2:
+        return 'longs piling up (big move more likely, direction unknown)'
+    return None
+
+
 def main():
     D = fetch()
     out = dict(time_berlin=pd.Timestamp.utcnow().tz_convert('Europe/Berlin').strftime('%Y-%m-%d %H:%M %Z'), time=str(pd.Timestamp.utcnow().floor('min')),
@@ -62,7 +73,9 @@ def main():
         out[c] = dict(price=float(d.ohlcv_c.iloc[-1]), oi_coins=float(d.open_c.iloc[-1]),
                       funding_pct=round(float(d.funding_c.dropna().iloc[-1]), 4),
                       ls_ratio=round(float(d.long_r.dropna().iloc[-1]), 2) if 'long_r' in d and d.long_r.notna().any() else None,
-                      **{f'w{n}h': window(d, n) for n in (1, 4, 24)})
+                      **{f'w{n}h': window(d, n) for n in (1, 4, 24, 72)})
+        out[c]['crowding_72h'] = crowding(out[c]['w72h'])
+    out['alerts'] = [f'{c}: {out[c]["crowding_72h"]}' for c in D if out[c]['crowding_72h']]
     with open(LOG, 'a') as fh:
         fh.write(json.dumps(out, default=str) + '\n')
     print(json.dumps(out, default=str, ensure_ascii=False, indent=1))
